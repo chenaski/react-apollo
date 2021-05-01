@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
-import { useQuery } from "@apollo/client";
 import { gql } from "@apollo/client/core";
+import { useUsersQuery } from "./generated/graphql";
 
 const USER_FRAGMENT_GQL = gql`
   fragment UserInfo on User {
@@ -13,7 +13,7 @@ const USER_FRAGMENT_GQL = gql`
 `;
 
 const USERS_GQL = gql`
-  {
+  query users {
     users {
       ...UserInfo
     }
@@ -55,9 +55,7 @@ const UPDATE_USER_GQL = gql`
 `;
 
 function App() {
-  const { data, loading, error } = useQuery<{
-    users: { id: string; name: string }[];
-  }>(USERS_GQL);
+  const { data, loading, error } = useUsersQuery();
 
   return (
     <div className="App">
