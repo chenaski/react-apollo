@@ -1,4 +1,11 @@
 .App {
   max-width: 500px;
   margin: 0 auto;
+  display: flex;
+}
+
+.App > * {
+  flex-grow: 1;
+  flex-basis: 0;
+  padding: 0 10px;
 }

@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import { gql } from "@apollo/client/core";
 import { useUsersQuery } from "./generated/graphql";
+import { CreateUserForm } from "./CreateUserForm";
 
 const USER_FRAGMENT_GQL = gql`
   fragment UserInfo on User {
@@ -59,19 +60,25 @@ function App() {
 
   return (
     <div className="App">
-      {loading ? (
-        <p>Loading...</p>
-      ) : data?.users.length ? (
-        <ul>
-          {data.users.map((user) => (
-            <li key={user.id}>{user.name}</li>
-          ))}
-        </ul>
-      ) : (
-        <p>There is no data available</p>
-      )}
+      <CreateUserForm />
 
-      {!!error && <p>{error}</p>}
+      <section>
+        <h1>Users</h1>
+
+        {loading ? (
+          <p>Loading...</p>
+        ) : data?.users.length ? (
+          <ul>
+            {data.users.map((user) => (
+              <li key={user.id}>{user.name}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>There is no data available</p>
+        )}
+
+        {!!error && <p>{error}</p>}
+      </section>
     </div>
   );
 }
