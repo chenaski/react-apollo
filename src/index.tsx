@@ -5,25 +5,11 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
-import { gql } from "@apollo/client/core";
 
 const client = new ApolloClient({
   uri: "http://localhost:4000/",
   cache: new InMemoryCache(),
 });
-
-client
-  .query({
-    query: gql`
-      {
-        books {
-          title
-          author
-        }
-      }
-    `,
-  })
-  .then(console.log);
 
 ReactDOM.render(
   <React.StrictMode>
