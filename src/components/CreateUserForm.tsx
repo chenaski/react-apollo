@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FormEvent } from "react";
-import { CreateUserInput, useCreateUserMutation } from "./generated/graphql";
-import { UsersList } from "./graphql/UsersList";
+import { CreateUserInput, useCreateUserMutation } from "../generated/graphql";
+import { UsersList } from "../graphql/UsersList";
 
 export const CreateUserForm = () => {
   const [createUserMutation, { loading, error }] = useCreateUserMutation({
