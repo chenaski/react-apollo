@@ -1,62 +1,10 @@
 import React from "react";
 import "./App.css";
-import { gql } from "@apollo/client/core";
-import { useUsersQuery } from "./generated/graphql";
+import { useUsersListQuery } from "./generated/graphql";
 import { CreateUserForm } from "./CreateUserForm";
 
-const USER_FRAGMENT_GQL = gql`
-  fragment UserInfo on User {
-    id
-    name
-    username
-    email
-  }
-`;
-
-const USERS_GQL = gql`
-  query users {
-    users {
-      ...UserInfo
-    }
-  }
-  ${USER_FRAGMENT_GQL}
-`;
-
-const USER_GQL = gql`
-  query user($id: ID!) {
-    user(id: $id) {
-      ...UserInfo
-    }
-  }
-  ${USER_FRAGMENT_GQL}
-`;
-
-const CREATE_USER_GQL = gql`
-  mutation createUser($createUserInput: CreateUserInput!) {
-    createUser(createUserInput: $createUserInput) {
-      ...UserInfo
-    }
-  }
-  ${USER_FRAGMENT_GQL}
-`;
-
-const REMOVE_USER_GQL = gql`
-  mutation removeUser($id: ID!) {
-    removeUser(id: $id)
-  }
-`;
-
-const UPDATE_USER_GQL = gql`
-  mutation updateUser($id: ID!, $updateUserInput: UpdateUserInput!) {
-    updateUser(id: $id, updateUserInput: $updateUserInput) {
-      ...UserInfo
-    }
-  }
-  ${USER_FRAGMENT_GQL}
-`;
-
 function App() {
-  const { data, loading, error } = useUsersQuery();
+  const { data, loading, error } = useUsersListQuery();
 
   return (
     <div className="App">
