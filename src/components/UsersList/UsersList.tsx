@@ -15,32 +15,40 @@ export const UsersList = () => {
     await removeUserMutation({ variables: { id } });
   };
 
+  const getErrorMessage = (): string | null => {
+    if (error?.message) return error.message;
+    else if (removeUserError?.message) return removeUserError.message;
+    else if (!data?.users.length) return "There is no data available";
+    return null;
+  };
+  const errorMessage = getErrorMessage();
+
   return (
     <section>
       <h1>Users</h1>
 
       {loading ? (
         <p>Loading...</p>
-      ) : data?.users.length ? (
-        <ul>
-          {data.users.map((user) => (
-            <li key={user.id} className={classes.listItem}>
-              {user.name}
-              <button
-                className={classes.removeButton}
-                onClick={() => handleRemoveButtonClick(user.id)}
-                disabled={removeUserLoading}
-              >
-                ×
-              </button>
-            </li>
-          ))}
-        </ul>
       ) : (
-        <p>There is no data available</p>
+        data?.users.length && (
+          <ul>
+            {data.users.map((user) => (
+              <li key={user.id} className={classes.listItem}>
+                {user.name}
+                <button
+                  className={classes.removeButton}
+                  onClick={() => handleRemoveButtonClick(user.id)}
+                  disabled={removeUserLoading}
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        )
       )}
 
-      {(!!error || !!removeUserError) && <p>{error || removeUserError}</p>}
+      {errorMessage && <p>{errorMessage}</p>}
     </section>
   );
 };
