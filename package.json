@@ -36,7 +36,7 @@
     "eject": "react-scripts eject",
     "server": "dotenv -c -- node server",
     "format": "prettier . -w -u",
-    "codegen": "graphql-codegen --config codegen.yml"
+    "codegen": "dotenv -c -- graphql-codegen --config codegen.yml"
   },
   "eslintConfig": {
     "extends": [
