@@ -9,7 +9,15 @@ export const UsersList = () => {
   const [
     removeUserMutation,
     { loading: removeUserLoading, error: removeUserError },
-  ] = useRemoveUserMutation();
+  ] = useRemoveUserMutation({
+    update: (cache, { data }) => {
+      if (data?.removeUser) {
+        cache.evict({
+          id: cache.identify(data?.removeUser),
+        });
+      }
+    },
+  });
 
   const handleRemoveButtonClick = async (id: string) => {
     await removeUserMutation({ variables: { id } });
@@ -30,7 +38,7 @@ export const UsersList = () => {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        data?.users.length && (
+        !!data?.users.length && (
           <ul>
             {data.users.map((user) => (
               <li key={user.id} className={classes.listItem}>

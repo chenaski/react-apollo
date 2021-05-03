@@ -30,7 +30,7 @@ const typeDefs = gql`
 
   type Mutation {
     createUser(createUserInput: CreateUserInput!): User
-    removeUser(id: ID!): Boolean
+    removeUser(id: ID!): User
     updateUser(id: ID!, updateUserInput: UpdateUserInput!): User
   }
 `;
@@ -56,9 +56,10 @@ const resolvers = {
       return createdUser;
     },
     removeUser: (_, { id }) => {
+      const removedUser = db.users.find((user) => id === user.id);
       db.users = db.users.filter((user) => id !== user.id);
 
-      return true;
+      return removedUser;
     },
     updateUser: (_, { id, updateUserInput }) => {
       const user = db.users.find((user) => id === user.id);

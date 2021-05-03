@@ -35,7 +35,7 @@ export type CreateUserInput = {
 export type Mutation = {
   __typename?: "Mutation";
   createUser?: Maybe<User>;
-  removeUser?: Maybe<Scalars["Boolean"]>;
+  removeUser?: Maybe<User>;
   updateUser?: Maybe<User>;
 };
 
@@ -98,10 +98,9 @@ export type RemoveUserMutationVariables = Exact<{
   id: Scalars["ID"];
 }>;
 
-export type RemoveUserMutation = { __typename?: "Mutation" } & Pick<
-  Mutation,
-  "removeUser"
->;
+export type RemoveUserMutation = { __typename?: "Mutation" } & {
+  removeUser?: Maybe<{ __typename?: "User" } & UserInfoFragment>;
+};
 
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars["ID"];
@@ -232,8 +231,11 @@ export type GetUserQueryResult = Apollo.QueryResult<
 >;
 export const RemoveUserDocument = gql`
   mutation RemoveUser($id: ID!) {
-    removeUser(id: $id)
+    removeUser(id: $id) {
+      ...UserInfo
+    }
   }
+  ${UserInfoFragmentDoc}
 `;
 export type RemoveUserMutationFn = Apollo.MutationFunction<
   RemoveUserMutation,
