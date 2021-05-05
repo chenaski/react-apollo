@@ -4,7 +4,11 @@ import {
 } from "../../generated/graphql";
 import classes from "./UsersList.module.css";
 
-export const UsersList = () => {
+export interface UsersListProps {
+  onSelectUser: ({ userId }: { userId: string }) => void;
+}
+
+export const UsersList = ({ onSelectUser }: UsersListProps) => {
   const { data, loading, error } = useUsersListQuery();
   const [
     removeUserMutation,
@@ -42,7 +46,10 @@ export const UsersList = () => {
           <ul>
             {data.users.map((user) => (
               <li key={user.id} className={classes.listItem}>
-                {user.name}
+                <button onClick={() => onSelectUser({ userId: user.id })}>
+                  {user.name}
+                </button>
+
                 <button
                   className={classes.removeButton}
                   onClick={() => handleRemoveButtonClick(user.id)}
