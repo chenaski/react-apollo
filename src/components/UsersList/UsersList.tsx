@@ -28,6 +28,7 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
   };
 
   const getErrorMessage = (): string | null => {
+    if (loading) return null;
     if (error?.message) return error.message;
     else if (removeUserError?.message) return removeUserError.message;
     else if (!data?.users.length) return "There is no data available";
