@@ -27,8 +27,10 @@
     "@graphql-codegen/typescript": "1.22.0",
     "@graphql-codegen/typescript-operations": "1.17.16",
     "@graphql-codegen/typescript-react-apollo": "2.2.4",
+    "lint-staged": "^11.0.0",
     "nodemon": "^2.0.7",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "simple-git-hooks": "^2.4.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -38,6 +40,12 @@
     "server": "dotenv -c -- nodemon -w server server",
     "format": "prettier . -w -u",
     "codegen": "dotenv -c -- graphql-codegen --config codegen.yml"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*": "prettier -w -u"
   },
   "eslintConfig": {
     "extends": [
