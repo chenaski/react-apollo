@@ -17,12 +17,12 @@ function App() {
   return (
     <div className={classes.App}>
       <div className={classes.AppRow}>
-        <CreateUserForm />
-        <UsersList onSelectUser={onSelectUser} />
-      </div>
+        <div>
+          <CreateUserForm />
+          {selectedUserId && <ChangeUserForm userId={selectedUserId} />}
+        </div>
 
-      <div className={classes.AppRow}>
-        {selectedUserId && <ChangeUserForm userId={selectedUserId} />}
+        <UsersList onSelectUser={onSelectUser} />
       </div>
     </div>
   );

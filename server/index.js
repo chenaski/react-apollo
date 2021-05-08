@@ -35,8 +35,23 @@ const typeDefs = gql`
   }
 `;
 
+const generateUser = () => {
+  const generateRandomString = () => Math.random().toString(36).substr(2, 5);
+
+  return {
+    id: generateRandomString(),
+    name: generateRandomString(),
+    username: generateRandomString(),
+    email: generateRandomString(),
+    password: generateRandomString(),
+  };
+};
+const getMockUsers = () => {
+  return new Array(100).fill(0).map(generateUser);
+};
+
 const db = {
-  users: [],
+  users: getMockUsers(),
 };
 
 const resolvers = {
