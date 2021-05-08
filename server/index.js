@@ -54,10 +54,14 @@ const db = {
   users: getMockUsers(),
 };
 
+const sleep = (result, ms = 5000) => {
+  return new Promise((resolve) => setTimeout(() => resolve(result), ms));
+};
+
 const resolvers = {
   Query: {
-    users: () => db.users,
-    user: (_, { id }) => db.users.find((user) => id === user.id),
+    users: () => sleep(db.users),
+    user: (_, { id }) => sleep(db.users.find((user) => id === user.id)),
   },
   Mutation: {
     createUser: (_, { createUserInput }) => {
@@ -68,13 +72,13 @@ const resolvers = {
 
       db.users.push(createdUser);
 
-      return createdUser;
+      return sleep(createdUser);
     },
     removeUser: (_, { id }) => {
       const removedUser = db.users.find((user) => id === user.id);
       db.users = db.users.filter((user) => id !== user.id);
 
-      return removedUser;
+      return sleep(removedUser);
     },
     updateUser: (_, { id, updateUserInput }) => {
       const user = db.users.find((user) => id === user.id);
@@ -83,7 +87,7 @@ const resolvers = {
       db.users = db.users.filter((user) => id !== user.id);
       db.users.unshift(updatedUser);
 
-      return updatedUser;
+      return sleep(updatedUser);
     },
   },
 };
