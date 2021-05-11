@@ -1,10 +1,11 @@
 import React, { ChangeEvent, FormEvent, MouseEvent } from "react";
 import classes from "./ChangeUserForm.module.css";
 import {
-  CreateUserInput,
+  UpdateUserInput,
   useGetUserQuery,
   UserInfoFragment,
   useUpdateUserMutation,
+  useUsersListQuery,
 } from "../../generated/graphql";
 import { GetUser } from "../../graphql/GetUser";
 
@@ -13,6 +14,7 @@ export interface ChangeUserProps {
 }
 
 export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
+  const { data: usersListData } = useUsersListQuery();
   const {
     data: getUserData,
     loading: getUserLoading,
@@ -39,6 +41,7 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
     name: "",
     email: "",
     password: "",
+    friends: getUserData?.user?.friends.map(({ id }) => id) || [],
   };
   const [formData, setFormData] = React.useState(initialFormState);
   const resetFormToInitalState = ({
@@ -47,8 +50,14 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
     user: UserInfoFragment | null | undefined;
   }) => {
     if (user) {
-      const { username, name, email } = user;
-      setFormData({ username, name, email, password: "" });
+      const { username, name, email, friends } = user;
+      setFormData({
+        username,
+        name,
+        email,
+        password: "",
+        friends: friends.map(({ id }) => id) || [],
+      });
     } else {
       setFormData(initialFormState);
     }
@@ -68,18 +77,29 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
     });
   };
 
-  const onChange = (name: keyof CreateUserInput) => (
+  const onChangeInput = (name: keyof UpdateUserInput) => (
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    const value = e.target.value;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: e.target.value,
     });
   };
-  const getInputProps = (name: keyof CreateUserInput) => ({
+  const onChangeSelect = (name: keyof UpdateUserInput) => (
+    e: ChangeEvent<HTMLSelectElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [name]: Array.from(e.target.selectedOptions, (option) => option.value),
+    });
+  };
+  const getInputProps = (name: keyof UpdateUserInput) => ({
     value: formData[name],
-    onChange: onChange(name),
+    onChange: onChangeInput(name),
+  });
+  const getSelectProps = (name: keyof UpdateUserInput) => ({
+    value: formData[name] as string[],
+    onChange: onChangeSelect(name),
   });
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -150,6 +170,21 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
             name={"new-password"}
             {...getInputProps("password")}
           />
+        </label>
+
+        <label>
+          Friends
+          <select
+            name={"new-friends"}
+            multiple={true}
+            {...getSelectProps("friends")}
+          >
+            {usersListData?.users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name}
+              </option>
+            ))}
+          </select>
         </label>
 
         <button disabled={updateUserLoading}>Save</button>

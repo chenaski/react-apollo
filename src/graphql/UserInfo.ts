@@ -6,5 +6,8 @@ export const UserInfo = gql`
     name
     username
     email
+    friends {
+      id
+    }
   }
 `;

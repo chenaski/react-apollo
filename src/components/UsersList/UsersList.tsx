@@ -47,8 +47,10 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
           <ul>
             {data.users.map((user) => (
               <li key={user.id} className={classes.listItem}>
+                <p>{user.name}</p>
+
                 <button onClick={() => onSelectUser({ userId: user.id })}>
-                  {user.name}
+                  Show profile
                 </button>
 
                 <button

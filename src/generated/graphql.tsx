@@ -67,6 +67,7 @@ export type UpdateUserInput = {
   username?: Maybe<Scalars["String"]>;
   email?: Maybe<Scalars["String"]>;
   password?: Maybe<Scalars["String"]>;
+  friends: Array<Scalars["ID"]>;
 };
 
 export type User = {
@@ -76,6 +77,7 @@ export type User = {
   username: Scalars["String"];
   email: Scalars["String"];
   password: Scalars["String"];
+  friends: Array<User>;
 };
 
 export type CreateUserMutationVariables = Exact<{
@@ -114,7 +116,7 @@ export type UpdateUserMutation = { __typename?: "Mutation" } & {
 export type UserInfoFragment = { __typename?: "User" } & Pick<
   User,
   "id" | "name" | "username" | "email"
->;
+> & { friends: Array<{ __typename?: "User" } & Pick<User, "id" | "name">> };
 
 export type UsersListQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -128,6 +130,10 @@ export const UserInfoFragmentDoc = gql`
     name
     username
     email
+    friends {
+      id
+      name
+    }
   }
 `;
 export const CreateUserDocument = gql`
