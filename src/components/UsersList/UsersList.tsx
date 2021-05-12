@@ -1,8 +1,6 @@
-import {
-  useRemoveUserMutation,
-  useUsersListQuery,
-} from "../../generated/graphql";
+import { useUsersListQuery } from "../../generated/graphql";
 import classes from "./UsersList.module.css";
+import { UsersListItem } from "../UsersListItem/UsersListItem";
 
 export interface UsersListProps {
   onSelectUser: ({ userId }: { userId: string }) => void;
@@ -10,27 +8,10 @@ export interface UsersListProps {
 
 export const UsersList = ({ onSelectUser }: UsersListProps) => {
   const { data, loading, error } = useUsersListQuery();
-  const [
-    removeUserMutation,
-    { loading: removeUserLoading, error: removeUserError },
-  ] = useRemoveUserMutation({
-    update: (cache, { data }) => {
-      if (data?.removeUser) {
-        cache.evict({
-          id: cache.identify(data?.removeUser),
-        });
-      }
-    },
-  });
-
-  const handleRemoveButtonClick = async (id: string) => {
-    await removeUserMutation({ variables: { id } });
-  };
 
   const getErrorMessage = (): string | null => {
     if (loading) return null;
     if (error?.message) return error.message;
-    else if (removeUserError?.message) return removeUserError.message;
     else if (!data?.users.length) return "There is no data available";
     return null;
   };
@@ -47,34 +28,7 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
           <ul>
             {data.users.map((user) => (
               <li key={user.id} className={classes.listItem}>
-                <p className={classes.userName}>{user.name}</p>
-
-                <button onClick={() => onSelectUser({ userId: user.id })}>
-                  Show profile
-                </button>
-
-                <button
-                  className={classes.removeButton}
-                  onClick={() => handleRemoveButtonClick(user.id)}
-                  disabled={removeUserLoading}
-                >
-                  ×
-                </button>
-
-                {!!user.friends.length && (
-                  <ul className={classes.friendsList}>
-                    {user.friends.map((friend) => (
-                      <li key={friend.id}>
-                        {friend.name}{" "}
-                        <button
-                          onClick={() => onSelectUser({ userId: friend.id })}
-                        >
-                          Show profile
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <UsersListItem userId={user.id} onSelectUser={onSelectUser} />
               </li>
             ))}
           </ul>
