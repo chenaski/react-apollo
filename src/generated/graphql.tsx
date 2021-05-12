@@ -116,7 +116,7 @@ export type UpdateUserMutation = { __typename?: "Mutation" } & {
 export type UserInfoFragment = { __typename?: "User" } & Pick<
   User,
   "id" | "name" | "username" | "email"
-> & { friends: Array<{ __typename?: "User" } & Pick<User, "id" | "name">> };
+> & { friends: Array<{ __typename?: "User" } & Pick<User, "id">> };
 
 export type UsersListQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -132,7 +132,6 @@ export const UserInfoFragmentDoc = gql`
     email
     friends {
       id
-      name
     }
   }
 `;
