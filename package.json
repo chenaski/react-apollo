@@ -39,7 +39,8 @@
     "eject": "react-scripts eject",
     "server": "dotenv -c -- nodemon -w server server",
     "format": "prettier . -w -u",
-    "codegen": "dotenv -c -- graphql-codegen --config codegen.yml"
+    "codegen": "dotenv -c -- graphql-codegen --config codegen.yml",
+    "codegen:watch": "npm run codegen -- -w"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
