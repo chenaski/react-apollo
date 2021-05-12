@@ -47,7 +47,7 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
           <ul>
             {data.users.map((user) => (
               <li key={user.id} className={classes.listItem}>
-                <p>{user.name}</p>
+                <p className={classes.userName}>{user.name}</p>
 
                 <button onClick={() => onSelectUser({ userId: user.id })}>
                   Show profile
@@ -60,6 +60,21 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
                 >
                   ×
                 </button>
+
+                {!!user.friends.length && (
+                  <ul className={classes.friendsList}>
+                    {user.friends.map((friend) => (
+                      <li key={friend.id}>
+                        {friend.name}{" "}
+                        <button
+                          onClick={() => onSelectUser({ userId: friend.id })}
+                        >
+                          Show profile
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>

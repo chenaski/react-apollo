@@ -2,6 +2,18 @@
   padding: 5px 0;
 }
 
+.userName {
+  margin-bottom: 10px;
+}
+
 .removeButton {
   margin-left: 10px;
+}
+
+.friendsList {
+  margin-top: 20px;
+}
+
+.friendsList li {
+  padding: 5px 0;
 }

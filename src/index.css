@@ -31,3 +31,7 @@ select {
   max-width: 200px;
   margin-top: 5px;
 }
+
+p {
+  margin: 0;
+}
