@@ -5,9 +5,18 @@ import App from "./components/App/App";
 import reportWebVitals from "./reportWebVitals";
 
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { BatchHttpLink } from "@apollo/client/link/batch-http";
+
+const uri = `http://localhost:${process.env.REACT_APP_SERVER_PORT}/`;
+
+const link = new BatchHttpLink({
+  uri,
+  batchMax: 50,
+  batchInterval: 20,
+});
 
 const client = new ApolloClient({
-  uri: `http://localhost:${process.env.REACT_APP_SERVER_PORT}/`,
+  link,
   cache: new InMemoryCache(),
   connectToDevTools: true,
 });
