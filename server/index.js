@@ -1,4 +1,5 @@
 const { ApolloServer, gql } = require("apollo-server");
+const DataLoader = require("dataloader");
 
 const typeDefs = gql`
   type User {
@@ -90,10 +91,21 @@ const sleep = (result, ms = 1000) => {
   return new Promise((resolve) => setTimeout(() => resolve(result), ms));
 };
 
+const userLoader = new DataLoader((ids) => {
+  console.log("Load Users:", ids);
+  return Promise.resolve(
+    ids.map((id) => db.users.find((user) => id === user.id))
+  );
+});
+
 const resolvers = {
   Query: {
-    users: () => sleep(db.users),
-    user: (_, { id }) => sleep(db.users.find((user) => id === user.id)),
+    users: () => {
+      return sleep(db.users);
+    },
+    user: async (_, { id }) => {
+      return sleep(await userLoader.load(id));
+    },
   },
   User: {
     friends: (user) => {
