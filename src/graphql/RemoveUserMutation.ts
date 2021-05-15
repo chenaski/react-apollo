@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client/core";
-import { UserInfo } from "./UserInfo";
+import { UserInfoFragment } from "./UserInfoFragment";
 
-export const RemoveUser = gql`
+export const RemoveUserMutation = gql`
   mutation RemoveUser($id: ID!) {
     removeUser(id: $id) {
       ...UserInfo
     }
   }
-  ${UserInfo}
+  ${UserInfoFragment}
 `;

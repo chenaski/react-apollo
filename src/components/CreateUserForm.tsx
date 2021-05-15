@@ -1,10 +1,10 @@
 import React, { ChangeEvent, FormEvent } from "react";
 import { CreateUserInput, useCreateUserMutation } from "../generated/graphql";
-import { UsersList } from "../graphql/UsersList";
+import { UsersListQuery } from "../graphql/UsersListQuery";
 
 export const CreateUserForm = () => {
   const [createUserMutation, { loading, error }] = useCreateUserMutation({
-    refetchQueries: [{ query: UsersList }],
+    refetchQueries: [{ query: UsersListQuery }],
   });
 
   const initialFormState = {
@@ -15,15 +15,14 @@ export const CreateUserForm = () => {
   };
   const [formData, setFormData] = React.useState(initialFormState);
 
-  const onChange = (name: keyof CreateUserInput) => (
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = e.target.value;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+  const onChange =
+    (name: keyof CreateUserInput) => (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    };
   const getInputProps = (name: keyof CreateUserInput) => ({
     value: formData[name],
     onChange: onChange(name),

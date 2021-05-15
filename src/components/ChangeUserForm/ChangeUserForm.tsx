@@ -7,7 +7,7 @@ import {
   useUpdateUserMutation,
   useUsersListQuery,
 } from "../../generated/graphql";
-import { GetUser } from "../../graphql/GetUser";
+import { GetUserQuery } from "../../graphql/GetUserQuery";
 
 export interface ChangeUserProps {
   userId: string;
@@ -28,7 +28,7 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
   ] = useUpdateUserMutation({
     refetchQueries: [
       {
-        query: GetUser,
+        query: GetUserQuery,
         variables: {
           id: userId,
         },
@@ -77,22 +77,20 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
     });
   };
 
-  const onChangeInput = (name: keyof UpdateUserInput) => (
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [name]: e.target.value,
-    });
-  };
-  const onChangeSelect = (name: keyof UpdateUserInput) => (
-    e: ChangeEvent<HTMLSelectElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [name]: Array.from(e.target.selectedOptions, (option) => option.value),
-    });
-  };
+  const onChangeInput =
+    (name: keyof UpdateUserInput) => (e: ChangeEvent<HTMLInputElement>) => {
+      setFormData({
+        ...formData,
+        [name]: e.target.value,
+      });
+    };
+  const onChangeSelect =
+    (name: keyof UpdateUserInput) => (e: ChangeEvent<HTMLSelectElement>) => {
+      setFormData({
+        ...formData,
+        [name]: Array.from(e.target.selectedOptions, (option) => option.value),
+      });
+    };
   const getInputProps = (name: keyof UpdateUserInput) => ({
     value: formData[name],
     onChange: onChangeInput(name),

@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client/core";
-import { UserInfo } from "./UserInfo";
+import { UserInfoFragment } from "./UserInfoFragment";
 
-export const CreateUser = gql`
+export const CreateUserMutation = gql`
   mutation CreateUser($createUserInput: CreateUserInput!) {
     createUser(createUserInput: $createUserInput) {
       ...UserInfo
     }
   }
-  ${UserInfo}
+  ${UserInfoFragment}
 `;

@@ -181,7 +181,8 @@ export function useCreateUserMutation(
 export type CreateUserMutationHookResult = ReturnType<
   typeof useCreateUserMutation
 >;
-export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
+export type CreateUserMutationResult =
+  Apollo.MutationResult<CreateUserMutation>;
 export type CreateUserMutationOptions = Apollo.BaseMutationOptions<
   CreateUserMutation,
   CreateUserMutationVariables
@@ -280,7 +281,8 @@ export function useRemoveUserMutation(
 export type RemoveUserMutationHookResult = ReturnType<
   typeof useRemoveUserMutation
 >;
-export type RemoveUserMutationResult = Apollo.MutationResult<RemoveUserMutation>;
+export type RemoveUserMutationResult =
+  Apollo.MutationResult<RemoveUserMutation>;
 export type RemoveUserMutationOptions = Apollo.BaseMutationOptions<
   RemoveUserMutation,
   RemoveUserMutationVariables
@@ -331,7 +333,8 @@ export function useUpdateUserMutation(
 export type UpdateUserMutationHookResult = ReturnType<
   typeof useUpdateUserMutation
 >;
-export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
+export type UpdateUserMutationResult =
+  Apollo.MutationResult<UpdateUserMutation>;
 export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<
   UpdateUserMutation,
   UpdateUserMutationVariables

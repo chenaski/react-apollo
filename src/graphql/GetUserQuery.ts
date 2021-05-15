@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client/core";
-import { UserInfo } from "./UserInfo";
+import { UserInfoFragment } from "./UserInfoFragment";
 
-export const GetUser = gql`
+export const GetUserQuery = gql`
   query GetUser($id: ID!) {
     user(id: $id) {
       ...UserInfo
     }
   }
-  ${UserInfo}
+  ${UserInfoFragment}
 `;
