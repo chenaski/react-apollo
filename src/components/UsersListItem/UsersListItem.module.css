@@ -6,6 +6,10 @@
   margin-bottom: 10px;
 }
 
+.changedUser {
+  background-color: lightgreen;
+}
+
 .removeButton {
   margin-left: 10px;
 }

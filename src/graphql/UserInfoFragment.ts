@@ -10,5 +10,6 @@ export const UserInfoFragment = gql`
       id
       name
     }
+    isChanged @client
   }
 `;

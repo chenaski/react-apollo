@@ -1,5 +1,7 @@
 overwrite: true
-schema: ${SCHEMA_PATH}
+schema:
+  - ${SCHEMA_PATH}
+  - "src/graphql/typeDefs.ts"
 documents: "src/graphql/*.ts"
 generates:
   src/generated/graphql.tsx:

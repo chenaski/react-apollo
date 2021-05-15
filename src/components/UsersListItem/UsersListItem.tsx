@@ -50,7 +50,13 @@ export const UsersListItem = ({ userId, onSelectUser }: UsersListItemProps) => {
 
   return (
     <>
-      <p className={classes.userName}>{user.name}</p>
+      <p
+        className={`${classes.userName} ${
+          user.isChanged ? classes.changedUser : ""
+        }`}
+      >
+        {user.name}
+      </p>
 
       <button onClick={() => onSelectUser({ userId: user.id })}>
         Show profile

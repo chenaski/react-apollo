@@ -4,6 +4,7 @@ import {
   UpdateUserInput,
   useGetUserQuery,
   UserInfoFragment,
+  useSetIsUserChangedMutation,
   useUpdateUserMutation,
   useUsersListQuery,
 } from "../../generated/graphql";
@@ -22,6 +23,7 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
   } = useGetUserQuery({
     variables: { id: userId },
   });
+  const [setIsUserChangedMutation] = useSetIsUserChangedMutation();
   const [
     updateUserMutation,
     { loading: updateUserLoading, error: updateUserError },
@@ -34,6 +36,11 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
         },
       },
     ],
+    onCompleted: async () => {
+      await setIsUserChangedMutation({
+        variables: { id: userId, isChanged: true },
+      });
+    },
   });
 
   const initialFormState = {
