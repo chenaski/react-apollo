@@ -127,6 +127,7 @@ const resolvers = {
       const removedUser = db.users.find((user) => id === user.id);
       db.users = db.users.filter((user) => id !== user.id);
 
+      userLoader.clear(id);
       return sleep(removedUser);
     },
     updateUser: (_, { id, updateUserInput }) => {
@@ -136,6 +137,7 @@ const resolvers = {
       db.users = db.users.filter((user) => id !== user.id);
       db.users.unshift(updatedUser);
 
+      userLoader.clear(id);
       return sleep(updatedUser);
     },
   },
