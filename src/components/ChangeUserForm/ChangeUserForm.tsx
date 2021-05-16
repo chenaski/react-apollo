@@ -1,5 +1,5 @@
 import React, { ChangeEvent, FormEvent, MouseEvent } from "react";
-import classes from "./ChangeUserForm.module.css";
+
 import {
   UpdateUserInput,
   useGetUserQuery,
@@ -9,6 +9,8 @@ import {
   useUsersListQuery,
 } from "../../generated/graphql";
 import { GetUserQuery } from "../../graphql/GetUserQuery";
+
+import classes from "./ChangeUserForm.module.css";
 
 export interface ChangeUserProps {
   userId: string;

@@ -1,14 +1,14 @@
 import React from "react";
-import classes from "./App.module.css";
 
+import { ChangeUserForm } from "../ChangeUserForm/ChangeUserForm";
 import { CreateUserForm } from "../CreateUserForm";
 import { UsersList } from "../UsersList/UsersList";
-import { ChangeUserForm } from "../ChangeUserForm/ChangeUserForm";
+
+import classes from "./App.module.css";
 
 function App() {
-  const [selectedUserId, setSelectedUserId] = React.useState<string | null>(
-    null
-  );
+  const [selectedUserId, setSelectedUserId] =
+    React.useState<string | null>(null);
   const onSelectUser = ({ userId }: { userId: string }) => {
     if (selectedUserId === userId) setSelectedUserId(null);
     else setSelectedUserId(userId);

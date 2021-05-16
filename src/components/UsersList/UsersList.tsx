@@ -1,6 +1,7 @@
 import { useUsersListQuery } from "../../generated/graphql";
-import classes from "./UsersList.module.css";
 import { UsersListItem } from "../UsersListItem/UsersListItem";
+
+import classes from "./UsersList.module.css";
 
 export interface UsersListProps {
   onSelectUser: ({ userId }: { userId: string }) => void;

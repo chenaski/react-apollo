@@ -1,13 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
-import App from "./components/App/App";
-import reportWebVitals from "./reportWebVitals";
 
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { BatchHttpLink } from "@apollo/client/link/batch-http";
-import { typeDefs } from "./graphql/typeDefs";
+
+import App from "./components/App/App";
 import { UserInfoFragment } from "./graphql/UserInfoFragment";
+import { typeDefs } from "./graphql/typeDefs";
+import "./index.css";
+import reportWebVitals from "./reportWebVitals";
 
 const uri = `http://localhost:${process.env.REACT_APP_SERVER_PORT}/`;
 

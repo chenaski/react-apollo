@@ -1,8 +1,9 @@
-import classes from "./UsersListItem.module.css";
 import {
   useGetUserQuery,
   useRemoveUserMutation,
 } from "../../generated/graphql";
+
+import classes from "./UsersListItem.module.css";
 
 export interface UsersListItemProps {
   userId: string;

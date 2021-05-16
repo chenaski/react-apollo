@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client/core";
+
 import { UserInfoFragment } from "./UserInfoFragment";
 
 export const GetUserQuery = gql`
