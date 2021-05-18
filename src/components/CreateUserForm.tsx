@@ -1,9 +1,14 @@
 import React, { ChangeEvent, FormEvent } from "react";
 
-import { CreateUserInput, useCreateUserMutation } from "../generated/graphql";
+import {
+  CreateUserInput,
+  useCreateUserMutation,
+  useUsersListQuery,
+} from "../generated/graphql";
 import { UsersListQuery } from "../graphql/UsersListQuery";
 
 export const CreateUserForm = () => {
+  const { data: usersListData } = useUsersListQuery();
   const [createUserMutation, { loading, error }] = useCreateUserMutation({
     refetchQueries: [{ query: UsersListQuery }],
   });
@@ -13,20 +18,31 @@ export const CreateUserForm = () => {
     name: "",
     email: "",
     password: "",
+    friends: [],
   };
   const [formData, setFormData] = React.useState(initialFormState);
 
-  const onChange =
+  const onChangeInput =
     (name: keyof CreateUserInput) => (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
       setFormData({
         ...formData,
-        [name]: value,
+        [name]: e.target.value,
+      });
+    };
+  const onChangeSelect =
+    (name: keyof CreateUserInput) => (e: ChangeEvent<HTMLSelectElement>) => {
+      setFormData({
+        ...formData,
+        [name]: Array.from(e.target.selectedOptions, (option) => option.value),
       });
     };
   const getInputProps = (name: keyof CreateUserInput) => ({
     value: formData[name],
-    onChange: onChange(name),
+    onChange: onChangeInput(name),
+  });
+  const getSelectProps = (name: keyof CreateUserInput) => ({
+    value: formData[name] as string[],
+    onChange: onChangeSelect(name),
   });
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -72,6 +88,21 @@ export const CreateUserForm = () => {
             name={"new-password"}
             {...getInputProps("password")}
           />
+        </label>
+
+        <label>
+          Friends
+          <select
+            name={"new-friends"}
+            multiple={true}
+            {...getSelectProps("friends")}
+          >
+            {usersListData?.users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name}
+              </option>
+            ))}
+          </select>
         </label>
 
         <button disabled={loading}>Create</button>

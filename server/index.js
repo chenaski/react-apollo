@@ -16,6 +16,7 @@ const typeDefs = gql`
     username: String!
     email: String!
     password: String!
+    friends: [ID!]!
   }
 
   input UpdateUserInput {
@@ -78,7 +79,7 @@ const generateUser = ({ id }) => {
 };
 
 const getMockUsers = () => {
-  return new Array(100)
+  return new Array(1)
     .fill(0)
     .map((_, index) => generateUser({ id: index.toString() }));
 };
@@ -121,7 +122,7 @@ const resolvers = {
 
       db.users.push(createdUser);
 
-      return sleep(createdUser);
+      return sleep(createdUser, 3000);
     },
     removeUser: (_, { id }) => {
       const removedUser = db.users.find((user) => id === user.id);

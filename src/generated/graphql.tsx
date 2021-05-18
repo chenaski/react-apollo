@@ -31,6 +31,7 @@ export type CreateUserInput = {
   username: Scalars["String"];
   email: Scalars["String"];
   password: Scalars["String"];
+  friends: Array<Scalars["ID"]>;
 };
 
 export type Mutation = {
