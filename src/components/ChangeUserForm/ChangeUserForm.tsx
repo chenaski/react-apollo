@@ -4,7 +4,8 @@ import {
   UpdateUserInput,
   useGetUserQuery,
   UserInfoFragment,
-  useSetIsUserChangedMutation,
+  UserUpdateStatus,
+  useSetUserUpdateStatusMutation,
   useUpdateUserMutation,
   useUsersListQuery,
 } from "../../generated/graphql";
@@ -25,7 +26,7 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
   } = useGetUserQuery({
     variables: { id: userId },
   });
-  const [setIsUserChangedMutation] = useSetIsUserChangedMutation();
+  const [setUserUpdateStatusMutation] = useSetUserUpdateStatusMutation();
   const [
     updateUserMutation,
     { loading: updateUserLoading, error: updateUserError },
@@ -39,8 +40,8 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
       },
     ],
     onCompleted: async () => {
-      await setIsUserChangedMutation({
-        variables: { id: userId, isChanged: true },
+      await setUserUpdateStatusMutation({
+        variables: { id: userId, status: UserUpdateStatus.Finished },
       });
     },
   });
@@ -112,6 +113,9 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    await setUserUpdateStatusMutation({
+      variables: { id: userId, status: UserUpdateStatus.InProgress },
+    });
     const { errors } = await updateUserMutation({
       variables: {
         id: userId,

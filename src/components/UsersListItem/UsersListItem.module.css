@@ -6,8 +6,18 @@
   margin-bottom: 10px;
 }
 
-.changedUser {
-  background-color: lightgreen;
+.userUpdateStatus {
+  padding: 2px 4px 3px;
+  font-size: 13px;
+  margin-left: 5px;
+}
+
+.userUpdating {
+  background: lavender;
+}
+
+.userUpdated {
+  background: lightgreen;
 }
 
 .removeButton {

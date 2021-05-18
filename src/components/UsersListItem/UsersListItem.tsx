@@ -1,6 +1,7 @@
 import {
   useGetUserQuery,
   useRemoveUserMutation,
+  UserUpdateStatus,
 } from "../../generated/graphql";
 
 import classes from "./UsersListItem.module.css";
@@ -53,10 +54,28 @@ export const UsersListItem = ({ userId, onSelectUser }: UsersListItemProps) => {
     <>
       <p
         className={`${classes.userName} ${
-          user.isChanged ? classes.changedUser : ""
+          user.updateStatus === UserUpdateStatus.Finished
+            ? classes.changedUser
+            : ""
         }`}
       >
         {user.name}
+
+        {user.updateStatus === UserUpdateStatus.InProgress && (
+          <span
+            className={`${classes.userUpdateStatus} ${classes.userUpdating}`}
+          >
+            Updating...
+          </span>
+        )}
+
+        {user.updateStatus === UserUpdateStatus.Finished && (
+          <span
+            className={`${classes.userUpdateStatus} ${classes.userUpdated}`}
+          >
+            Updated
+          </span>
+        )}
       </p>
 
       <button onClick={() => onSelectUser({ userId: user.id })}>

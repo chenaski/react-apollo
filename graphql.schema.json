@@ -180,7 +180,7 @@
             "deprecationReason": null
           },
           {
-            "name": "setIsUserChanged",
+            "name": "setUserUpdateStatus",
             "description": null,
             "args": [
               {
@@ -200,14 +200,14 @@
                 "deprecationReason": null
               },
               {
-                "name": "isChanged",
+                "name": "status",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "SCALAR",
-                    "name": "Boolean",
+                    "kind": "ENUM",
+                    "name": "UserUpdateStatus",
                     "ofType": null
                   }
                 },
@@ -518,22 +518,6 @@
             "deprecationReason": null
           },
           {
-            "name": "isChanged",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "name",
             "description": null,
             "args": [],
@@ -566,6 +550,22 @@
             "deprecationReason": null
           },
           {
+            "name": "updateStatus",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "UserUpdateStatus",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "username",
             "description": null,
             "args": [],
@@ -585,6 +585,35 @@
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "UserUpdateStatus",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "NONE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "IN_PROGRESS",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "FINISHED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {

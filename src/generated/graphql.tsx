@@ -37,7 +37,7 @@ export type Mutation = {
   __typename?: "Mutation";
   createUser?: Maybe<User>;
   removeUser?: Maybe<User>;
-  setIsUserChanged: Scalars["Boolean"];
+  setUserUpdateStatus: Scalars["Boolean"];
   updateUser?: Maybe<User>;
 };
 
@@ -49,9 +49,9 @@ export type MutationRemoveUserArgs = {
   id: Scalars["ID"];
 };
 
-export type MutationSetIsUserChangedArgs = {
+export type MutationSetUserUpdateStatusArgs = {
   id: Scalars["ID"];
-  isChanged: Scalars["Boolean"];
+  status: UserUpdateStatus;
 };
 
 export type MutationUpdateUserArgs = {
@@ -82,11 +82,17 @@ export type User = {
   email: Scalars["String"];
   friends: Array<User>;
   id: Scalars["ID"];
-  isChanged: Scalars["Boolean"];
   name: Scalars["String"];
   password: Scalars["String"];
+  updateStatus: UserUpdateStatus;
   username: Scalars["String"];
 };
+
+export enum UserUpdateStatus {
+  None = "NONE",
+  InProgress = "IN_PROGRESS",
+  Finished = "FINISHED",
+}
 
 export type CreateUserMutationVariables = Exact<{
   createUserInput: CreateUserInput;
@@ -112,14 +118,14 @@ export type RemoveUserMutation = { __typename?: "Mutation" } & {
   removeUser?: Maybe<{ __typename?: "User" } & UserInfoFragment>;
 };
 
-export type SetIsUserChangedMutationVariables = Exact<{
+export type SetUserUpdateStatusMutationVariables = Exact<{
   id: Scalars["ID"];
-  isChanged: Scalars["Boolean"];
+  status: UserUpdateStatus;
 }>;
 
-export type SetIsUserChangedMutation = { __typename?: "Mutation" } & Pick<
+export type SetUserUpdateStatusMutation = { __typename?: "Mutation" } & Pick<
   Mutation,
-  "setIsUserChanged"
+  "setUserUpdateStatus"
 >;
 
 export type UpdateUserMutationVariables = Exact<{
@@ -133,7 +139,7 @@ export type UpdateUserMutation = { __typename?: "Mutation" } & {
 
 export type UserInfoFragment = { __typename?: "User" } & Pick<
   User,
-  "id" | "name" | "username" | "email" | "isChanged"
+  "id" | "name" | "username" | "email" | "updateStatus"
 > & { friends: Array<{ __typename?: "User" } & Pick<User, "id" | "name">> };
 
 export type UsersListQueryVariables = Exact<{ [key: string]: never }>;
@@ -152,7 +158,7 @@ export const UserInfoFragmentDoc = gql`
       id
       name
     }
-    isChanged @client
+    updateStatus @client
   }
 `;
 export const CreateUserDocument = gql`
@@ -306,54 +312,54 @@ export type RemoveUserMutationOptions = Apollo.BaseMutationOptions<
   RemoveUserMutation,
   RemoveUserMutationVariables
 >;
-export const SetIsUserChangedDocument = gql`
-  mutation setIsUserChanged($id: ID!, $isChanged: Boolean!) {
-    setIsUserChanged(id: $id, isChanged: $isChanged) @client
+export const SetUserUpdateStatusDocument = gql`
+  mutation setUserUpdateStatus($id: ID!, $status: UserUpdateStatus!) {
+    setUserUpdateStatus(id: $id, status: $status) @client
   }
 `;
-export type SetIsUserChangedMutationFn = Apollo.MutationFunction<
-  SetIsUserChangedMutation,
-  SetIsUserChangedMutationVariables
+export type SetUserUpdateStatusMutationFn = Apollo.MutationFunction<
+  SetUserUpdateStatusMutation,
+  SetUserUpdateStatusMutationVariables
 >;
 
 /**
- * __useSetIsUserChangedMutation__
+ * __useSetUserUpdateStatusMutation__
  *
- * To run a mutation, you first call `useSetIsUserChangedMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSetIsUserChangedMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useSetUserUpdateStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetUserUpdateStatusMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [setIsUserChangedMutation, { data, loading, error }] = useSetIsUserChangedMutation({
+ * const [setUserUpdateStatusMutation, { data, loading, error }] = useSetUserUpdateStatusMutation({
  *   variables: {
  *      id: // value for 'id'
- *      isChanged: // value for 'isChanged'
+ *      status: // value for 'status'
  *   },
  * });
  */
-export function useSetIsUserChangedMutation(
+export function useSetUserUpdateStatusMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    SetIsUserChangedMutation,
-    SetIsUserChangedMutationVariables
+    SetUserUpdateStatusMutation,
+    SetUserUpdateStatusMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    SetIsUserChangedMutation,
-    SetIsUserChangedMutationVariables
-  >(SetIsUserChangedDocument, options);
+    SetUserUpdateStatusMutation,
+    SetUserUpdateStatusMutationVariables
+  >(SetUserUpdateStatusDocument, options);
 }
-export type SetIsUserChangedMutationHookResult = ReturnType<
-  typeof useSetIsUserChangedMutation
+export type SetUserUpdateStatusMutationHookResult = ReturnType<
+  typeof useSetUserUpdateStatusMutation
 >;
-export type SetIsUserChangedMutationResult =
-  Apollo.MutationResult<SetIsUserChangedMutation>;
-export type SetIsUserChangedMutationOptions = Apollo.BaseMutationOptions<
-  SetIsUserChangedMutation,
-  SetIsUserChangedMutationVariables
+export type SetUserUpdateStatusMutationResult =
+  Apollo.MutationResult<SetUserUpdateStatusMutation>;
+export type SetUserUpdateStatusMutationOptions = Apollo.BaseMutationOptions<
+  SetUserUpdateStatusMutation,
+  SetUserUpdateStatusMutationVariables
 >;
 export const UpdateUserDocument = gql`
   mutation UpdateUser($id: ID!, $updateUserInput: UpdateUserInput!) {

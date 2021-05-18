@@ -5,6 +5,7 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { BatchHttpLink } from "@apollo/client/link/batch-http";
 
 import App from "./components/App/App";
+import { UserUpdateStatus } from "./generated/graphql";
 import { UserInfoFragment } from "./graphql/UserInfoFragment";
 import { typeDefs } from "./graphql/typeDefs";
 import "./index.css";
@@ -24,12 +25,12 @@ const client = new ApolloClient({
   typeDefs,
   resolvers: {
     Mutation: {
-      setIsUserChanged: (_, { id, isChanged }, { cache }) => {
+      setUserUpdateStatus: (_, { id, status }, { cache }) => {
         cache.writeFragment({
           id: cache.identify({ __typename: "User", id }),
           fragment: UserInfoFragment,
           data: {
-            isChanged,
+            updateStatus: status,
           },
         });
 
@@ -37,13 +38,13 @@ const client = new ApolloClient({
       },
     },
     User: {
-      isChanged: (user, _, { cache }) => {
+      updateStatus: (user, _, { cache }) => {
         const cacheUser = cache.readFragment({
           id: cache.identify(user),
           fragment: UserInfoFragment,
         });
 
-        return cacheUser?.isChanged || false;
+        return cacheUser?.updateStatus || UserUpdateStatus.None;
       },
     },
   },

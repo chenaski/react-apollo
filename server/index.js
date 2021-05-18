@@ -138,7 +138,7 @@ const resolvers = {
       db.users.unshift(updatedUser);
 
       userLoader.clear(id);
-      return sleep(updatedUser);
+      return sleep(updatedUser, 3000);
     },
   },
 };
