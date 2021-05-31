@@ -1,5 +1,7 @@
 import React, { ChangeEvent, FormEvent, MouseEvent } from "react";
 
+import { useApolloClient } from "@apollo/client";
+
 import {
   UpdateUserInput,
   useGetUserQuery,
@@ -18,6 +20,7 @@ export interface ChangeUserProps {
 }
 
 export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
+  const client = useApolloClient();
   const { data: usersListData } = useUsersListQuery();
   const {
     data: getUserData,
@@ -54,6 +57,8 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
     friends: getUserData?.user?.friends.map(({ id }) => id) || [],
   };
   const [formData, setFormData] = React.useState(initialFormState);
+  const [userBeforePreview, setUserBeforePreview] =
+    React.useState<UserInfoFragment | null>(null);
   const resetFormToInitalState = ({
     user,
   }: {
@@ -113,6 +118,8 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setUserBeforePreview(null);
+
     await setUserUpdateStatusMutation({
       variables: { id: userId, status: UserUpdateStatus.InProgress },
     });
@@ -126,8 +133,43 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
     setStatus({ isSuccess: !!errors });
   };
 
-  const resetForm = (e: MouseEvent<HTMLButtonElement>) => {
-    resetFormToInitalState({ user: getUserData?.user });
+  const handlePreviewButtonClick = () => {
+    if (!getUserData?.user) return;
+
+    setUserBeforePreview(getUserData.user);
+
+    const getUsersByIds = (ids: string[]): UserInfoFragment[] => {
+      return ids.reduce((users, id) => {
+        const { user } = client.readQuery({
+          query: GetUserQuery,
+          variables: {
+            id,
+          },
+        });
+
+        if (!user) return users;
+
+        return [...users, user];
+      }, [] as UserInfoFragment[]);
+    };
+
+    client.writeQuery({
+      query: GetUserQuery,
+      variables: {
+        id: userId,
+      },
+      data: {
+        user: {
+          ...getUserData.user,
+          ...formData,
+          friends: getUsersByIds(formData.friends),
+        },
+      },
+    });
+  };
+
+  const resetForm = () => {
+    resetFormToInitalState({ user: userBeforePreview || getUserData?.user });
   };
 
   if (getUserLoading) {
@@ -203,8 +245,17 @@ export const ChangeUserForm = ({ userId }: ChangeUserProps) => {
           type={"button"}
           className={classes.resetButton}
           onClick={resetForm}
+          disabled={updateUserLoading}
         >
           Reset
+        </button>
+        <button
+          type={"button"}
+          className={classes.previewButton}
+          onClick={handlePreviewButtonClick}
+          disabled={updateUserLoading}
+        >
+          Preview
         </button>
 
         {isSuccess && <p>Successfully updated!</p>}

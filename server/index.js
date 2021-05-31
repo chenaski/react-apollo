@@ -79,7 +79,7 @@ const generateUser = ({ id }) => {
 };
 
 const getMockUsers = () => {
-  return new Array(1)
+  return new Array(20)
     .fill(0)
     .map((_, index) => generateUser({ id: index.toString() }));
 };

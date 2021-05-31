@@ -11,6 +11,9 @@
 - [x] Local resolvers
 - [ ] Manual cache update
   - [ ] readFragment/writeFragment
-  - [ ] readQuery/writeQuery
+  - [x] readQuery/writeQuery
   - [ ] update
 - [ ] optimisticResponse
+- [ ] Fragment Matcher
+- [ ] Response type
+- [ ] Errors/Exceptions
