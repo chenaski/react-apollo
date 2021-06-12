@@ -1,14 +1,25 @@
-.App {
+.container {
   max-width: 600px;
   margin: 0 auto;
+  padding: 0 20px;
 }
 
-.AppRow {
+.columns {
   display: flex;
 }
 
-.AppRow > * {
+.columns > * + * {
+  margin-left: 50px;
+}
+
+.rightColumn {
   flex-grow: 1;
-  flex-basis: 0;
-  padding: 0 20px;
+}
+
+.actions {
+  width: 200px;
+}
+
+.actions > * + * {
+  margin-top: 20px;
 }

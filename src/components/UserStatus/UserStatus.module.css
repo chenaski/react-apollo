@@ -1,0 +1,29 @@
+.userStatus {
+  padding: 2px 4px 3px;
+  font-size: 13px;
+  margin-left: 5px;
+}
+
+.statusUpdating {
+  background: lavender;
+}
+
+.statusUpdated {
+  background: lightgreen;
+}
+
+.statusUpdateFailure {
+  background: lightcoral;
+}
+
+.statusRemoving {
+  background: pink;
+}
+
+.statusRemoved {
+  background: lightcoral;
+}
+
+.statusRemoveFailure {
+  background: lightgray;
+}

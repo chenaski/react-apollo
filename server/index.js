@@ -4,52 +4,38 @@ const DataLoader = require("dataloader");
 const typeDefs = gql`
   type User {
     id: ID!
-    name: String!
     username: String!
-    email: String!
-    password: String!
     friends: [User!]!
   }
 
   input CreateUserInput {
-    name: String!
     username: String!
-    email: String!
-    password: String!
-    friends: [ID!]!
   }
 
-  input UpdateUserInput {
-    name: String
-    username: String
-    email: String
-    password: String
-    friends: [ID!]!
+  input ChangeUsernameInput {
+    username: String!
   }
 
   type Query {
     users: [User!]!
-    user(id: ID!): User
+    user(userId: ID!): User
   }
 
   type Mutation {
     createUser(createUserInput: CreateUserInput!): User
-    removeUser(id: ID!): User
-    updateUser(id: ID!, updateUserInput: UpdateUserInput!): User
+    removeUser(userId: ID!): User
+    changeUsername(userId: ID!, changeUsernameInput: ChangeUsernameInput!): User
   }
 `;
 
 const generateUser = ({ id }) => {
   const generateRandomString = () => Math.random().toString(36).substr(2, 5);
-  const generateEmail = () => {
-    return `${generateRandomString()}@${generateRandomString()}`;
-  };
   const generateRandomNumber = ({ min, max, excluded } = {}) => {
     if (!min) min = 0;
     if (!excluded) excluded = [];
 
-    const randomNumber = Math.round(
-      min - 0.5 + Math.random() * (max - min + 1)
+    const randomNumber = Math.abs(
+      Math.round(min - 0.5 + Math.random() * (max - min + 1))
     );
 
     return excluded.includes(randomNumber)
@@ -57,21 +43,18 @@ const generateUser = ({ id }) => {
       : randomNumber;
   };
 
-  const excludedFriendsIds = [];
+  const excludedFriendsIds = [id];
 
   return {
     id,
-    name: generateRandomString(),
     username: generateRandomString(),
-    email: generateEmail(),
-    password: generateRandomString(),
-    friends: new Array(10).fill(0).map(() => {
+    friends: new Array(1).fill(0).map(() => {
       const friendId = generateRandomNumber({
-        max: 99,
-        excluded: excludedFriendsIds,
+        max: 2,
+        excluded: excludedFriendsIds.map((id) => +id),
       });
 
-      excludedFriendsIds.push(friendId);
+      excludedFriendsIds.push(friendId.toString());
 
       return friendId.toString();
     }),
@@ -79,7 +62,7 @@ const generateUser = ({ id }) => {
 };
 
 const getMockUsers = () => {
-  return new Array(20)
+  return new Array(3)
     .fill(0)
     .map((_, index) => generateUser({ id: index.toString() }));
 };
@@ -104,8 +87,8 @@ const resolvers = {
     users: () => {
       return sleep(db.users);
     },
-    user: async (_, { id }) => {
-      return sleep(await userLoader.load(id));
+    user: async (_, { userId }) => {
+      return sleep(await userLoader.load(userId));
     },
   },
   User: {
@@ -117,28 +100,29 @@ const resolvers = {
     createUser: (_, { createUserInput }) => {
       const createdUser = {
         id: db.users.length.toString(),
+        friends: [],
         ...createUserInput,
       };
 
       db.users.push(createdUser);
 
-      return sleep(createdUser, 3000);
+      return sleep(createdUser);
     },
-    removeUser: (_, { id }) => {
-      const removedUser = db.users.find((user) => id === user.id);
-      db.users = db.users.filter((user) => id !== user.id);
+    removeUser: (_, { userId }) => {
+      const removedUser = db.users.find((user) => userId === user.id);
+      db.users = db.users.filter((user) => userId !== user.id);
 
-      userLoader.clear(id);
+      userLoader.clear(userId);
       return sleep(removedUser);
     },
-    updateUser: (_, { id, updateUserInput }) => {
-      const user = db.users.find((user) => id === user.id);
-      const updatedUser = { ...user, ...updateUserInput };
+    changeUsername: (_, { userId, changeUsernameInput }) => {
+      const user = db.users.find((user) => userId === user.id);
+      const updatedUser = { ...user, ...changeUsernameInput };
 
-      db.users = db.users.filter((user) => id !== user.id);
+      db.users = db.users.filter((user) => userId !== user.id);
       db.users.unshift(updatedUser);
 
-      userLoader.clear(id);
+      userLoader.clear(userId);
       return sleep(updatedUser, 3000);
     },
   },

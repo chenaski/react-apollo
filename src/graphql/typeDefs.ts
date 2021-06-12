@@ -5,15 +5,25 @@ export const typeDefs = gql`
 
   enum UserUpdateStatus {
     NONE
-    IN_PROGRESS
-    FINISHED
+    STARTED
+    SUCCESS
+    FAILURE
+  }
+
+  enum UserRemoveStatus {
+    NONE
+    STARTED
+    SUCCESS
+    FAILURE
   }
 
   extend type Mutation {
-    setUserUpdateStatus(id: ID!, status: UserUpdateStatus!): Boolean!
+    setUserUpdateStatus(userId: ID!, status: UserUpdateStatus!): Boolean!
+    setUserRemoveStatus(userId: ID!, status: UserRemoveStatus!): Boolean!
   }
 
   extend type User {
     updateStatus: UserUpdateStatus!
+    removeStatus: UserRemoveStatus!
   }
 `;

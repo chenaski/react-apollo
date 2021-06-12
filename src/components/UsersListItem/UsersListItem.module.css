@@ -1,31 +1,33 @@
-.listItem {
-  padding: 5px 0;
+.userInfoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.userName {
-  margin-bottom: 10px;
+.userActions {
+  display: flex;
 }
 
-.userUpdateStatus {
-  padding: 2px 4px 3px;
-  font-size: 13px;
+.userActions > * + * {
   margin-left: 5px;
 }
 
-.userUpdating {
-  background: lavender;
+.userName {
+  margin-right: 10px;
 }
 
-.userUpdated {
-  background: lightgreen;
+.friendsListContainer {
+  margin-top: 10px;
 }
 
-.removeButton {
-  margin-left: 10px;
+.friendsListTitle {
+  text-decoration: underline;
+  color: #585858;
+  margin-bottom: 5px;
 }
 
 .friendsList {
-  margin-top: 20px;
+  padding: 5px 0 5px 20px;
 }
 
 .friendsList li {

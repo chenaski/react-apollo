@@ -1,106 +1,59 @@
-import {
-  useGetUserQuery,
-  useRemoveUserMutation,
-  UserUpdateStatus,
-} from "../../generated/graphql";
+import { useGetUserQuery } from "../../generated/graphql";
+import { UserStatus } from "../UserStatus/UserStatus";
 
 import classes from "./UsersListItem.module.css";
 
 export interface UsersListItemProps {
   userId: string;
-  onSelectUser: ({ userId }: { userId: string }) => void;
+  onSelectUser?: ({ userId }: { userId: string }) => void;
 }
 
 export const UsersListItem = ({ userId, onSelectUser }: UsersListItemProps) => {
   const { data, loading, error } = useGetUserQuery({
-    variables: { id: userId },
+    variables: { userId },
   });
-  const [
-    removeUserMutation,
-    { loading: removeUserLoading, error: removeUserError },
-  ] = useRemoveUserMutation({
-    update: (cache, { data }) => {
-      if (data?.removeUser) {
-        cache.evict({
-          id: cache.identify(data?.removeUser),
-        });
-      }
-    },
-  });
-
-  const handleRemoveButtonClick = async (id: string) => {
-    await removeUserMutation({ variables: { id } });
-  };
 
   if (loading) {
     return <p>Loading...</p>;
-  } else if (error || removeUserError) {
-    return (
-      <p>
-        {error?.message ||
-          removeUserError?.message ||
-          "Something went wrong..."}
-      </p>
-    );
+  } else if (error) {
+    return <p>Something went wrong...</p>;
   } else if (!data?.user) {
     return <p>User not found</p>;
-  } else if (removeUserLoading) {
-    return <p>User removing...</p>;
   }
 
   const user = data.user;
 
   return (
     <>
-      <p
-        className={`${classes.userName} ${
-          user.updateStatus === UserUpdateStatus.Finished
-            ? classes.changedUser
-            : ""
-        }`}
-      >
-        {user.name}
+      <div className={classes.userInfoRow}>
+        <p className={classes.userName}>
+          <b>{user.username}</b>
 
-        {user.updateStatus === UserUpdateStatus.InProgress && (
-          <span
-            className={`${classes.userUpdateStatus} ${classes.userUpdating}`}
+          <UserStatus
+            updateStatus={user.updateStatus}
+            removeStatus={user.removeStatus}
+          />
+        </p>
+
+        <div className={classes.userActions}>
+          <button
+            onClick={() => onSelectUser && onSelectUser({ userId: user.id })}
           >
-            Updating...
-          </span>
-        )}
-
-        {user.updateStatus === UserUpdateStatus.Finished && (
-          <span
-            className={`${classes.userUpdateStatus} ${classes.userUpdated}`}
-          >
-            Updated
-          </span>
-        )}
-      </p>
-
-      <button onClick={() => onSelectUser({ userId: user.id })}>
-        Show profile
-      </button>
-
-      <button
-        className={classes.removeButton}
-        onClick={() => handleRemoveButtonClick(user.id)}
-        disabled={removeUserLoading}
-      >
-        ×
-      </button>
+            Edit
+          </button>
+        </div>
+      </div>
 
       {!!user.friends.length && (
-        <ul className={classes.friendsList}>
-          {user.friends.map((friend) => (
-            <li key={friend.id}>
-              {friend.name}{" "}
-              <button onClick={() => onSelectUser({ userId: friend.id })}>
-                Show profile
-              </button>
-            </li>
-          ))}
-        </ul>
+        <div className={classes.friendsListContainer}>
+          <p className={classes.friendsListTitle}>Friends:</p>
+
+          <ul className={classes.friendsList}>
+            {user.friends.map((friend) => (
+              <li key={friend.id}>{friend.username}</li>
+            ))}
+          </ul>
+        </div>
       )}
     </>
   );

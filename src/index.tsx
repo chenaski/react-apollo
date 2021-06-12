@@ -5,7 +5,7 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { BatchHttpLink } from "@apollo/client/link/batch-http";
 
 import App from "./components/App/App";
-import { UserUpdateStatus } from "./generated/graphql";
+import { UserRemoveStatus, UserUpdateStatus } from "./generated/graphql";
 import { UserInfoFragment } from "./graphql/UserInfoFragment";
 import { typeDefs } from "./graphql/typeDefs";
 import "./index.css";
@@ -25,12 +25,23 @@ const client = new ApolloClient({
   typeDefs,
   resolvers: {
     Mutation: {
-      setUserUpdateStatus: (_, { id, status }, { cache }) => {
+      setUserUpdateStatus: (_, { userId, status }, { cache }) => {
         cache.writeFragment({
-          id: cache.identify({ __typename: "User", id }),
+          id: cache.identify({ __typename: "User", id: userId }),
           fragment: UserInfoFragment,
           data: {
             updateStatus: status,
+          },
+        });
+
+        return true;
+      },
+      setUserRemoveStatus: (_, { userId, status }, { cache }) => {
+        cache.writeFragment({
+          id: cache.identify({ __typename: "User", id: userId }),
+          fragment: UserInfoFragment,
+          data: {
+            removeStatus: status,
           },
         });
 
@@ -45,6 +56,14 @@ const client = new ApolloClient({
         });
 
         return cacheUser?.updateStatus || UserUpdateStatus.None;
+      },
+      removeStatus: (user, _, { cache }) => {
+        const cacheUser = cache.readFragment({
+          id: cache.identify(user),
+          fragment: UserInfoFragment,
+        });
+
+        return cacheUser?.removeStatus || UserRemoveStatus.None;
       },
     },
   },

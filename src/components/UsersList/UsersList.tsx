@@ -4,7 +4,7 @@ import { UsersListItem } from "../UsersListItem/UsersListItem";
 import classes from "./UsersList.module.css";
 
 export interface UsersListProps {
-  onSelectUser: ({ userId }: { userId: string }) => void;
+  onSelectUser?: ({ userId }: { userId: string }) => void;
 }
 
 export const UsersList = ({ onSelectUser }: UsersListProps) => {
@@ -20,13 +20,13 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
 
   return (
     <section>
-      <h1>Users</h1>
+      <h2 className={classes.title}>Users</h2>
 
       {loading ? (
         <p>Loading...</p>
       ) : (
         !!data?.users.length && (
-          <ul>
+          <ul className={classes.list}>
             {data.users.map((user) => (
               <li key={user.id} className={classes.listItem}>
                 <UsersListItem userId={user.id} onSelectUser={onSelectUser} />

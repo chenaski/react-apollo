@@ -32,6 +32,19 @@ select {
   margin-top: 5px;
 }
 
+input {
+  height: 30px;
+  padding: 0 10px;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
 p {
   margin: 0;
 }

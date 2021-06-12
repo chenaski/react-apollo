@@ -1,0 +1,16 @@
+.formTitle {
+  margin: 0 0 10px;
+}
+
+.form {
+  margin-bottom: 10px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.buttons > * + * {
+  margin-top: 5px;
+}
