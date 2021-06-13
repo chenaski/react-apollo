@@ -18,6 +18,18 @@
   padding: 0 0 1px;
 }
 
+.labelRow {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.labelRow input {
+  width: 15px;
+  margin: 0 5px 0 0;
+}
+
 .list {
   list-style: hiragana-iroha;
   padding: 0;

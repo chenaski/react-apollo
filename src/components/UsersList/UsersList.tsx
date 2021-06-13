@@ -10,7 +10,10 @@ export interface UsersListProps {
 }
 
 export const UsersList = ({ onSelectUser }: UsersListProps) => {
-  const { data, loading, error, refetch } = useUsersListQuery();
+  const [notifyOnChange, setNotifyOnChange] = React.useState(false);
+  const { data, loading, error, refetch } = useUsersListQuery({
+    notifyOnNetworkStatusChange: notifyOnChange,
+  });
 
   const getErrorMessage = (): string | null => {
     if (loading) return null;
@@ -32,6 +35,15 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
           ↻
         </button>
       </div>
+
+      <label className={classes.labelRow}>
+        <input
+          type="checkbox"
+          checked={notifyOnChange}
+          onChange={(e) => setNotifyOnChange(e.currentTarget.checked)}
+        />
+        notifyOnNetworkStatusChange
+      </label>
 
       {loading ? (
         <p>Loading...</p>
