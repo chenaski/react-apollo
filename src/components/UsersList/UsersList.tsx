@@ -1,3 +1,5 @@
+import React from "react";
+
 import { useUsersListQuery } from "../../generated/graphql";
 import { UsersListItem } from "../UsersListItem/UsersListItem";
 
@@ -8,7 +10,7 @@ export interface UsersListProps {
 }
 
 export const UsersList = ({ onSelectUser }: UsersListProps) => {
-  const { data, loading, error } = useUsersListQuery();
+  const { data, loading, error, refetch } = useUsersListQuery();
 
   const getErrorMessage = (): string | null => {
     if (loading) return null;
@@ -20,7 +22,16 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
 
   return (
     <section>
-      <h2 className={classes.title}>Users</h2>
+      <div className={classes.header}>
+        <h2 className={classes.title}>Users</h2>
+        <button
+          className={classes.refetechButton}
+          onClick={() => refetch()}
+          disabled={loading}
+        >
+          ↻
+        </button>
+      </div>
 
       {loading ? (
         <p>Loading...</p>

@@ -1,5 +1,21 @@
-.title {
+.header {
+  display: flex;
   margin: 0 0 10px;
+}
+
+.title {
+  margin: 0;
+}
+
+.refetechButton {
+  width: 28px;
+  height: 28px;
+  margin-left: 20px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0 1px;
 }
 
 .list {
