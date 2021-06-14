@@ -1,0 +1,12 @@
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.checkboxRow input {
+  width: 15px;
+  height: 15px;
+  margin: 0 5px 0 0;
+}

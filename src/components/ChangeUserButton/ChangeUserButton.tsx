@@ -3,19 +3,26 @@ import React from "react";
 import { useApolloClient } from "@apollo/client";
 
 import {
+  ChangeUsernameInput,
+  ChangeUsernameMutation,
   useChangeUsernameMutation,
+  useGetUserQuery,
   UserUpdateStatus,
   useSetUserUpdateStatusMutation,
-} from "../generated/graphql";
-import { GetUserQuery } from "../graphql/GetUserQuery";
-import { UserInfoFragment } from "../graphql/UserInfoFragment";
+  UserInfoFragment as UserInfo,
+} from "../../generated/graphql";
+import { GetUserQuery } from "../../graphql/GetUserQuery";
+import { UserInfoFragment } from "../../graphql/UserInfoFragment";
+import { Button } from "../Button/Button";
+import { CheckboxRow } from "../CheckboxRow/CheckboxRow";
 
-import { Button } from "./Button/Button";
+import classes from "./ChangeUserButton.module.css";
 
 export interface ChangeUserButtonProps {
   userId: string;
   username: string;
   cacheOnly?: "writeQuery" | "writeFragment";
+  optimistic?: boolean;
   className?: string;
   onSuccess: (username?: string) => void;
   children: React.ReactNode;
@@ -25,11 +32,37 @@ export const ChangeUserButton = ({
   userId,
   username,
   cacheOnly,
+  optimistic,
   onSuccess,
   className,
   children,
 }: ChangeUserButtonProps) => {
   const apolloClient = useApolloClient();
+  const [isOptimisticUpdateEnabled, setIsOptimisticUpdateEnabled] =
+    React.useState(false);
+
+  const { data } = useGetUserQuery({ variables: { userId } });
+  const getOptimisticResponse = ():
+    | (({
+        userId,
+        changeUsernameInput,
+      }: {
+        userId: string;
+        changeUsernameInput: ChangeUsernameInput;
+      }) => ChangeUsernameMutation)
+    | undefined => {
+    if (!isOptimisticUpdateEnabled || !data?.user) return;
+
+    return (vars) => {
+      return {
+        changeUsername: {
+          ...(data?.user as UserInfo),
+          username: vars.changeUsernameInput.username,
+        },
+      };
+    };
+  };
+
   const [setUserUpdateStatus] = useSetUserUpdateStatusMutation();
   const [changeUsername, { loading }] = useChangeUsernameMutation({
     onCompleted: async (data) => {
@@ -44,6 +77,7 @@ export const ChangeUserButton = ({
         variables: { userId, status: UserUpdateStatus.Failure },
       });
     },
+    optimisticResponse: getOptimisticResponse(),
   });
 
   const getUserCacheId = ({
@@ -110,7 +144,7 @@ export const ChangeUserButton = ({
     }
   };
 
-  return (
+  const button = (
     <Button
       onClick={onClick}
       disabled={loading}
@@ -120,4 +154,23 @@ export const ChangeUserButton = ({
       {children}
     </Button>
   );
+
+  if (optimistic) {
+    return (
+      <div className={classes.buttonContainer}>
+        {button}
+
+        {optimistic && (
+          <CheckboxRow
+            onChange={setIsOptimisticUpdateEnabled}
+            checked={isOptimisticUpdateEnabled}
+          >
+            Optimistic Update
+          </CheckboxRow>
+        )}
+      </div>
+    );
+  }
+
+  return button;
 };

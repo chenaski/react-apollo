@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useGetUserQuery } from "../../generated/graphql";
-import { ChangeUserButton } from "../ChangeUserButton";
+import { ChangeUserButton } from "../ChangeUserButton/ChangeUserButton";
 
 import classes from "./ChangeUser.module.css";
 
@@ -46,7 +46,11 @@ export const ChangeUser = ({ userId }: ChangeUserProps) => {
       </form>
 
       <div className={classes.buttons}>
-        <ChangeUserButton {...commonButtonProps} username={username}>
+        <ChangeUserButton
+          {...commonButtonProps}
+          username={username}
+          optimistic={true}
+        >
           Change User - API
         </ChangeUserButton>
 

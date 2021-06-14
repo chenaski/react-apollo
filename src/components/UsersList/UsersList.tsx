@@ -1,6 +1,7 @@
 import React from "react";
 
 import { useUsersListQuery } from "../../generated/graphql";
+import { CheckboxRow } from "../CheckboxRow/CheckboxRow";
 import { UsersListItem } from "../UsersListItem/UsersListItem";
 
 import classes from "./UsersList.module.css";
@@ -36,14 +37,13 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
         </button>
       </div>
 
-      <label className={classes.labelRow}>
-        <input
-          type="checkbox"
-          checked={notifyOnChange}
-          onChange={(e) => setNotifyOnChange(e.currentTarget.checked)}
-        />
+      <CheckboxRow
+        className={classes.checkboxRow}
+        checked={notifyOnChange}
+        onChange={setNotifyOnChange}
+      >
         notifyOnNetworkStatusChange
-      </label>
+      </CheckboxRow>
 
       {loading ? (
         <p>Loading...</p>

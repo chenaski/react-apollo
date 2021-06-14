@@ -1,0 +1,10 @@
+.buttonContainer {
+  border: 1px solid #767676;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.buttonContainer button {
+  width: 100%;
+  margin-bottom: 5px;
+}
