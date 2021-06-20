@@ -1,0 +1,20 @@
+.notifications {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  padding: 10px;
+  list-style: none;
+  min-width: 200px;
+  margin: 0;
+}
+
+.notifications > * + * {
+  margin-top: 5px;
+}
+
+.notification {
+  border: 1px solid #767676;
+  padding: 10px;
+  border-radius: 3px;
+  font-size: 14px;
+}

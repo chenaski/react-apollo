@@ -76,6 +76,17 @@ export type QueryUserArgs = {
   userId: Scalars["ID"];
 };
 
+export type ServerAction = {
+  __typename?: "ServerAction";
+  date: Scalars["String"];
+  message: Scalars["String"];
+};
+
+export type Subscription = {
+  __typename?: "Subscription";
+  serverActionPerformed?: Maybe<ServerAction>;
+};
+
 export type User = {
   __typename?: "User";
   friends: Array<User>;
@@ -130,6 +141,18 @@ export type RemoveUserMutationVariables = Exact<{
 
 export type RemoveUserMutation = { __typename?: "Mutation" } & {
   removeUser?: Maybe<{ __typename?: "User" } & UserInfoFragment>;
+};
+
+export type ServerActionPerformedSubscriptionVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type ServerActionPerformedSubscription = {
+  __typename?: "Subscription";
+} & {
+  serverActionPerformed?: Maybe<
+    { __typename?: "ServerAction" } & Pick<ServerAction, "date" | "message">
+  >;
 };
 
 export type SetUserRemoveStatusMutationVariables = Exact<{
@@ -381,6 +404,47 @@ export type RemoveUserMutationOptions = Apollo.BaseMutationOptions<
   RemoveUserMutation,
   RemoveUserMutationVariables
 >;
+export const ServerActionPerformedDocument = gql`
+  subscription ServerActionPerformed {
+    serverActionPerformed {
+      date
+      message
+    }
+  }
+`;
+
+/**
+ * __useServerActionPerformedSubscription__
+ *
+ * To run a query within a React component, call `useServerActionPerformedSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useServerActionPerformedSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useServerActionPerformedSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useServerActionPerformedSubscription(
+  baseOptions?: Apollo.SubscriptionHookOptions<
+    ServerActionPerformedSubscription,
+    ServerActionPerformedSubscriptionVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSubscription<
+    ServerActionPerformedSubscription,
+    ServerActionPerformedSubscriptionVariables
+  >(ServerActionPerformedDocument, options);
+}
+export type ServerActionPerformedSubscriptionHookResult = ReturnType<
+  typeof useServerActionPerformedSubscription
+>;
+export type ServerActionPerformedSubscriptionResult =
+  Apollo.SubscriptionResult<ServerActionPerformedSubscription>;
 export const SetUserRemoveStatusDocument = gql`
   mutation setUserRemoveStatus($userId: ID!, $status: UserRemoveStatus!) {
     setUserRemoveStatus(userId: $userId, status: $status) @client

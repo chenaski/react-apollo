@@ -1,8 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import {
+  ApolloClient,
+  ApolloProvider,
+  InMemoryCache,
+  split,
+} from "@apollo/client";
 import { BatchHttpLink } from "@apollo/client/link/batch-http";
+import { WebSocketLink } from "@apollo/client/link/ws";
+import { getMainDefinition } from "@apollo/client/utilities";
 
 import App from "./components/App/App";
 import { UserRemoveStatus, UserUpdateStatus } from "./generated/graphql";
@@ -11,16 +18,36 @@ import { typeDefs } from "./graphql/typeDefs";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 
-const uri = `http://localhost:${process.env.REACT_APP_SERVER_PORT}/`;
+const httpUrl = `http://localhost:${process.env.REACT_APP_SERVER_PORT}/`;
+const wsUrl = `ws://localhost:${process.env.REACT_APP_SERVER_PORT}/subscriptions`;
 
-const link = new BatchHttpLink({
-  uri,
+const httpLink = new BatchHttpLink({
+  uri: httpUrl,
   batchMax: 50,
   batchInterval: 20,
 });
 
+const wsLink = new WebSocketLink({
+  uri: wsUrl,
+  options: {
+    reconnect: true,
+  },
+});
+
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    );
+  },
+  wsLink,
+  httpLink
+);
+
 const client = new ApolloClient({
-  link,
+  link: splitLink,
   cache: new InMemoryCache(),
   typeDefs,
   resolvers: {

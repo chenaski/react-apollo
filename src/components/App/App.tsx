@@ -2,6 +2,7 @@ import React from "react";
 
 import { AddUser } from "../AddUser/AddUser";
 import { ChangeUser } from "../ChangeUser/ChangeUser";
+import { Notifications } from "../Notifications/Notifications";
 import { RemoveUser } from "../RemoveUser/RemoveUser";
 import { UsersList } from "../UsersList/UsersList";
 
@@ -35,6 +36,8 @@ function App() {
           <UsersList onSelectUser={onSelectUser} />
         </div>
       </div>
+
+      <Notifications />
     </div>
   );
 }

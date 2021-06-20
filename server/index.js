@@ -1,5 +1,19 @@
 const { ApolloServer, gql } = require("apollo-server");
 const DataLoader = require("dataloader");
+const { PubSub } = require("apollo-server");
+
+const pubsub = new PubSub();
+
+const SERVER_ACTION_PERFORMED = "SERVER_ACTION_PERFORMED";
+
+const onServerActionPerformed = (message) => {
+  return pubsub.publish(SERVER_ACTION_PERFORMED, {
+    serverActionPerformed: {
+      date: new Date().toISOString(),
+      message,
+    },
+  });
+};
 
 const typeDefs = gql`
   type User {
@@ -16,6 +30,11 @@ const typeDefs = gql`
     username: String!
   }
 
+  type ServerAction {
+    date: String!
+    message: String!
+  }
+
   type Query {
     users: [User!]!
     user(userId: ID!): User
@@ -25,6 +44,10 @@ const typeDefs = gql`
     createUser(createUserInput: CreateUserInput!): User
     removeUser(userId: ID!): User
     changeUsername(userId: ID!, changeUsernameInput: ChangeUsernameInput!): User
+  }
+
+  type Subscription {
+    serverActionPerformed: ServerAction
   }
 `;
 
@@ -97,22 +120,38 @@ const resolvers = {
     },
   },
   Mutation: {
-    createUser: (_, { createUserInput }) => {
+    createUser: async (_, { createUserInput }) => {
+      await sleep(onServerActionPerformed("Start user creation"));
+
       const createdUser = {
         id: db.users.length.toString(),
         friends: [],
         ...createUserInput,
       };
 
+      await sleep(onServerActionPerformed("User object created"));
+
       db.users.push(createdUser);
+
+      await sleep(onServerActionPerformed("User added to `db.users`"));
 
       return sleep(createdUser);
     },
-    removeUser: (_, { userId }) => {
+    removeUser: async (_, { userId }) => {
+      await sleep(onServerActionPerformed("Start user deleting"));
+
       const removedUser = db.users.find((user) => userId === user.id);
+
+      await sleep(onServerActionPerformed("User found in `db.users`"));
+
       db.users = db.users.filter((user) => userId !== user.id);
 
+      await sleep(onServerActionPerformed("User deleted from `db.users`"));
+
       userLoader.clear(userId);
+
+      await sleep(onServerActionPerformed("User deleted from cache"));
+
       return sleep(removedUser);
     },
     changeUsername: (_, { userId, changeUsernameInput }) => {
@@ -126,9 +165,20 @@ const resolvers = {
       return sleep(updatedUser, 3000);
     },
   },
+  Subscription: {
+    serverActionPerformed: {
+      subscribe: () => pubsub.asyncIterator([SERVER_ACTION_PERFORMED]),
+    },
+  },
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  subscriptions: {
+    path: "/subscriptions",
+  },
+});
 
 server.listen({ port: process.env.SERVER_PORT }).then(({ url }) => {
   console.log(`🚀  Server ready at ${url}`);
