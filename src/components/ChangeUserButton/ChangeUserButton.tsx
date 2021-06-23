@@ -10,6 +10,7 @@ import {
   UserUpdateStatus,
   useSetUserUpdateStatusMutation,
   UserInfoFragment as UserInfo,
+  ErrorsFragment,
 } from "../../generated/graphql";
 import { GetUserQuery } from "../../graphql/GetUserQuery";
 import { UserInfoFragment } from "../../graphql/UserInfoFragment";
@@ -25,6 +26,7 @@ export interface ChangeUserButtonProps {
   optimistic?: boolean;
   className?: string;
   onSuccess: (username?: string) => void;
+  onError?: (errors: ErrorsFragment[]) => void;
   children: React.ReactNode;
 }
 
@@ -34,6 +36,7 @@ export const ChangeUserButton = ({
   cacheOnly,
   optimistic,
   onSuccess,
+  onError,
   className,
   children,
 }: ChangeUserButtonProps) => {
@@ -56,8 +59,10 @@ export const ChangeUserButton = ({
     return (vars) => {
       return {
         changeUsername: {
-          ...(data?.user as UserInfo),
-          username: vars.changeUsernameInput.username,
+          record: {
+            ...(data?.user as UserInfo),
+            username: vars.changeUsernameInput.username,
+          },
         },
       };
     };
@@ -70,7 +75,11 @@ export const ChangeUserButton = ({
         variables: { userId, status: UserUpdateStatus.Success },
       });
 
-      onSuccess && onSuccess(data.changeUsername?.username);
+      if (data.changeUsername?.errors) {
+        onError && onError(data.changeUsername?.errors);
+      } else {
+        onSuccess && onSuccess(data.changeUsername?.record?.username);
+      }
     },
     onError: async () => {
       await setUserUpdateStatus({

@@ -1,15 +1,27 @@
 import React from "react";
 
+import { ErrorsFragment } from "../../generated/graphql";
 import { AddUserButton } from "../AddUserButton";
+import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
 
 import classes from "./AddUser.module.css";
 
 export const AddUser = () => {
   const [username, setUsername] = React.useState("");
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const commonButtonProps = {
     username,
     onSuccess: () => setUsername(""),
+    onError: (errors: ErrorsFragment[]) => {
+      const messages = errors.map(({ message }) => message);
+
+      setErrorMessage(messages.join(". "));
+
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    },
   };
 
   return (
@@ -24,6 +36,10 @@ export const AddUser = () => {
           />
         </label>
       </form>
+
+      <ErrorMessage className={classes.errorMessage}>
+        {errorMessage}
+      </ErrorMessage>
 
       <div className={classes.buttons}>
         <AddUserButton {...commonButtonProps}>Add User</AddUserButton>

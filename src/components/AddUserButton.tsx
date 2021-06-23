@@ -1,6 +1,10 @@
 import React from "react";
 
-import { useCreateUserMutation, UserInfoFragment } from "../generated/graphql";
+import {
+  ErrorsFragment,
+  useCreateUserMutation,
+  UserInfoFragment,
+} from "../generated/graphql";
 import { GetUserQuery } from "../graphql/GetUserQuery";
 import { UsersListQuery } from "../graphql/UsersListQuery";
 
@@ -11,6 +15,7 @@ export interface AddUserButtonProps {
   updatePolicy?: "refetch" | "cacheUpdate";
   cacheUpdateTarget?: "list" | "item" | "listAndItem";
   onSuccess?: () => void;
+  onError?: (errors: ErrorsFragment[]) => void;
   className?: string;
   children: React.ReactNode;
 }
@@ -20,6 +25,7 @@ export const AddUserButton = ({
   updatePolicy,
   cacheUpdateTarget = "listAndItem",
   onSuccess,
+  onError,
   className,
   children,
 }: AddUserButtonProps) => {
@@ -31,7 +37,7 @@ export const AddUserButton = ({
           cache.readQuery({
             query: UsersListQuery,
           });
-        const user = data?.createUser;
+        const user = data?.createUser?.record;
 
         if (!usersListQueryResult?.users || !user) return;
 
@@ -62,7 +68,9 @@ export const AddUserButton = ({
       },
     });
 
-    if (!result.errors) {
+    if (result.data?.createUser?.errors) {
+      onError && onError(result.data?.createUser?.errors);
+    } else if (!result.errors) {
       onSuccess && onSuccess();
     }
   };

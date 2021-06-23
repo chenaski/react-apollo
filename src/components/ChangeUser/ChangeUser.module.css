@@ -14,3 +14,7 @@
 .buttons > * + * {
   margin-top: 5px;
 }
+
+.errorMessage {
+  margin-bottom: 10px;
+}

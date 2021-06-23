@@ -1,5 +1,7 @@
 import React from "react";
 
+import { ErrorsFragment } from "../../generated/graphql";
+import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
 import { RemoveUserButton } from "../RemoveUserButton";
 
 import classes from "./RemoveUser.module.css";
@@ -10,14 +12,30 @@ export interface RemoveUserProps {
 }
 
 export const RemoveUser = ({ userId, onRemoveUser }: RemoveUserProps) => {
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
   const commonButtonProps = {
     userId,
     onSuccess: onRemoveUser,
+    onError: (errors: ErrorsFragment[]) => {
+      const messages = errors.map(({ message }) => message);
+
+      setErrorMessage(messages.join(". "));
+
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    },
   };
 
   return (
     <section>
       <h2 className={classes.formTitle}>Remove User</h2>
+
+      <ErrorMessage className={classes.errorMessage}>
+        {errorMessage}
+      </ErrorMessage>
+
       <div className={classes.buttons}>
         <RemoveUserButton {...commonButtonProps}>Remove User</RemoveUserButton>
 

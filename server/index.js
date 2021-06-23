@@ -26,8 +26,23 @@ const typeDefs = gql`
     username: String!
   }
 
+  type CreateUserPayload {
+    record: User
+    errors: [Error!]
+  }
+
   input ChangeUsernameInput {
     username: String!
+  }
+
+  type ChangeUsernamePayload {
+    record: User
+    errors: [Error!]
+  }
+
+  type RemoveUserPayload {
+    record: User
+    errors: [Error!]
   }
 
   type ServerAction {
@@ -35,15 +50,29 @@ const typeDefs = gql`
     message: String!
   }
 
+  type ServerError {
+    message: String!
+  }
+
+  type ValidationError {
+    message: String!
+    field: String!
+  }
+
+  union Error = ServerError | ValidationError
+
   type Query {
     users: [User!]!
     user(userId: ID!): User
   }
 
   type Mutation {
-    createUser(createUserInput: CreateUserInput!): User
-    removeUser(userId: ID!): User
-    changeUsername(userId: ID!, changeUsernameInput: ChangeUsernameInput!): User
+    createUser(createUserInput: CreateUserInput!): CreateUserPayload
+    removeUser(userId: ID!): RemoveUserPayload
+    changeUsername(
+      userId: ID!
+      changeUsernameInput: ChangeUsernameInput!
+    ): ChangeUsernamePayload
   }
 
   type Subscription {
@@ -119,9 +148,41 @@ const resolvers = {
       return db.users.filter((dbUser) => user.friends.includes(dbUser.id));
     },
   },
+  Error: {
+    __resolveType: (obj) => {
+      if (obj.field) {
+        return "ValidationError";
+      }
+
+      return "ServerError";
+    },
+  },
   Mutation: {
     createUser: async (_, { createUserInput }) => {
       await sleep(onServerActionPerformed("Start user creation"));
+
+      if (createUserInput.username === "") {
+        return sleep({
+          errors: [
+            {
+              code: 1,
+              message: "`Username` must be at least one character",
+              field: "username",
+            },
+          ],
+        });
+      }
+
+      if (db.users.find((user) => user.username === createUserInput.username)) {
+        return sleep({
+          errors: [
+            {
+              code: 1,
+              message: `User with username "${createUserInput.username}" already exists`,
+            },
+          ],
+        });
+      }
 
       const createdUser = {
         id: db.users.length.toString(),
@@ -135,12 +196,23 @@ const resolvers = {
 
       await sleep(onServerActionPerformed("User added to `db.users`"));
 
-      return sleep(createdUser);
+      return sleep({ record: createdUser });
     },
     removeUser: async (_, { userId }) => {
       await sleep(onServerActionPerformed("Start user deleting"));
 
       const removedUser = db.users.find((user) => userId === user.id);
+
+      if (!removedUser) {
+        return {
+          errors: [
+            {
+              code: 1,
+              message: `User with id "${userId}" not found`,
+            },
+          ],
+        };
+      }
 
       await sleep(onServerActionPerformed("User found in `db.users`"));
 
@@ -152,17 +224,41 @@ const resolvers = {
 
       await sleep(onServerActionPerformed("User deleted from cache"));
 
-      return sleep(removedUser);
+      return sleep({ record: removedUser });
     },
     changeUsername: (_, { userId, changeUsernameInput }) => {
+      if (changeUsernameInput.username === "") {
+        return sleep({
+          errors: [
+            {
+              code: 1,
+              message: "`Username` must be at least one character",
+              field: "username",
+            },
+          ],
+        });
+      }
+
       const user = db.users.find((user) => userId === user.id);
+
+      if (!user) {
+        return {
+          errors: [
+            {
+              code: 1,
+              message: `User with id "${userId}" not found`,
+            },
+          ],
+        };
+      }
+
       const updatedUser = { ...user, ...changeUsernameInput };
 
       db.users = db.users.filter((user) => userId !== user.id);
       db.users.unshift(updatedUser);
 
       userLoader.clear(userId);
-      return sleep(updatedUser, 3000);
+      return sleep({ record: updatedUser }, 3000);
     },
   },
   Subscription: {

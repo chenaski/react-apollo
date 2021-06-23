@@ -1,6 +1,7 @@
 import React from "react";
 
 import {
+  ErrorsFragment,
   useRemoveUserMutation,
   UserInfoFragment,
   UserRemoveStatus,
@@ -16,6 +17,7 @@ export interface RemoveUserButtonProps {
   updatePolicy?: "refetch" | "cacheUpdate";
   cacheUpdateTarget?: "list" | "item" | "listAndItem";
   onSuccess?: () => void;
+  onError?: (errors: ErrorsFragment[]) => void;
   className?: string;
   children: React.ReactNode;
 }
@@ -25,6 +27,7 @@ export const RemoveUserButton = ({
   updatePolicy,
   cacheUpdateTarget = "listAndItem",
   onSuccess,
+  onError,
   className,
   children,
 }: RemoveUserButtonProps) => {
@@ -37,7 +40,7 @@ export const RemoveUserButton = ({
           cache.readQuery({
             query: UsersListQuery,
           });
-        const user = data?.removeUser;
+        const user = data?.removeUser?.record;
 
         if (!usersListQueryResult?.users || !user) return;
 
@@ -61,12 +64,16 @@ export const RemoveUserButton = ({
         }
       }
     },
-    onCompleted: async () => {
+    onCompleted: async (data) => {
       await setUserRemoveStatus({
         variables: { userId, status: UserRemoveStatus.Success },
       });
 
-      onSuccess && onSuccess();
+      if (data.removeUser?.errors) {
+        onError && onError(data.removeUser?.errors);
+      } else {
+        onSuccess && onSuccess();
+      }
     },
     onError: async () => {
       await setUserRemoveStatus({

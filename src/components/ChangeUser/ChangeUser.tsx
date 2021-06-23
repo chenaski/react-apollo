@@ -1,7 +1,8 @@
 import React from "react";
 
-import { useGetUserQuery } from "../../generated/graphql";
+import { ErrorsFragment, useGetUserQuery } from "../../generated/graphql";
 import { ChangeUserButton } from "../ChangeUserButton/ChangeUserButton";
+import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
 
 import classes from "./ChangeUser.module.css";
 
@@ -12,6 +13,7 @@ export interface ChangeUserProps {
 export const ChangeUser = ({ userId }: ChangeUserProps) => {
   const { data, loading, error } = useGetUserQuery({ variables: { userId } });
   const [username, setUsername] = React.useState(data?.user?.username || "");
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     setUsername(data?.user?.username || "");
@@ -30,6 +32,15 @@ export const ChangeUser = ({ userId }: ChangeUserProps) => {
     username,
     onSuccess: (updatedUsername?: string) =>
       setUsername(updatedUsername || username),
+    onError: (errors: ErrorsFragment[]) => {
+      const messages = errors.map(({ message }) => message);
+
+      setErrorMessage(messages.join(". "));
+
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    },
   };
 
   return (
@@ -44,6 +55,10 @@ export const ChangeUser = ({ userId }: ChangeUserProps) => {
           />
         </label>
       </form>
+
+      <ErrorMessage className={classes.errorMessage}>
+        {errorMessage}
+      </ErrorMessage>
 
       <div className={classes.buttons}>
         <ChangeUserButton

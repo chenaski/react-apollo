@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client/core";
 
+import { ErrorFragment } from "./ErrorFragment";
 import { UserInfoFragment } from "./UserInfoFragment";
 
 export const ChangeUsernameMutation = gql`
@@ -8,8 +9,14 @@ export const ChangeUsernameMutation = gql`
     $changeUsernameInput: ChangeUsernameInput!
   ) {
     changeUsername(userId: $userId, changeUsernameInput: $changeUsernameInput) {
-      ...UserInfo
+      record {
+        ...UserInfo
+      }
+      errors {
+        ...Errors
+      }
     }
   }
   ${UserInfoFragment}
+  ${ErrorFragment}
 `;

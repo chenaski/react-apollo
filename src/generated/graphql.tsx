@@ -30,15 +30,29 @@ export type ChangeUsernameInput = {
   username: Scalars["String"];
 };
 
+export type ChangeUsernamePayload = {
+  __typename?: "ChangeUsernamePayload";
+  record?: Maybe<User>;
+  errors?: Maybe<Array<Error>>;
+};
+
 export type CreateUserInput = {
   username: Scalars["String"];
 };
 
+export type CreateUserPayload = {
+  __typename?: "CreateUserPayload";
+  record?: Maybe<User>;
+  errors?: Maybe<Array<Error>>;
+};
+
+export type Error = ServerError | ValidationError;
+
 export type Mutation = {
   __typename?: "Mutation";
-  changeUsername?: Maybe<User>;
-  createUser?: Maybe<User>;
-  removeUser?: Maybe<User>;
+  changeUsername?: Maybe<ChangeUsernamePayload>;
+  createUser?: Maybe<CreateUserPayload>;
+  removeUser?: Maybe<RemoveUserPayload>;
   setUserRemoveStatus: Scalars["Boolean"];
   setUserUpdateStatus: Scalars["Boolean"];
 };
@@ -76,9 +90,20 @@ export type QueryUserArgs = {
   userId: Scalars["ID"];
 };
 
+export type RemoveUserPayload = {
+  __typename?: "RemoveUserPayload";
+  record?: Maybe<User>;
+  errors?: Maybe<Array<Error>>;
+};
+
 export type ServerAction = {
   __typename?: "ServerAction";
   date: Scalars["String"];
+  message: Scalars["String"];
+};
+
+export type ServerError = {
+  __typename?: "ServerError";
   message: Scalars["String"];
 };
 
@@ -110,13 +135,31 @@ export enum UserUpdateStatus {
   Failure = "FAILURE",
 }
 
+export type ValidationError = {
+  __typename?: "ValidationError";
+  message: Scalars["String"];
+  field: Scalars["String"];
+};
+
 export type ChangeUsernameMutationVariables = Exact<{
   userId: Scalars["ID"];
   changeUsernameInput: ChangeUsernameInput;
 }>;
 
 export type ChangeUsernameMutation = { __typename?: "Mutation" } & {
-  changeUsername?: Maybe<{ __typename?: "User" } & UserInfoFragment>;
+  changeUsername?: Maybe<
+    { __typename?: "ChangeUsernamePayload" } & {
+      record?: Maybe<{ __typename?: "User" } & UserInfoFragment>;
+      errors?: Maybe<
+        Array<
+          | ({ __typename?: "ServerError" } & Errors_ServerError_Fragment)
+          | ({
+              __typename?: "ValidationError";
+            } & Errors_ValidationError_Fragment)
+        >
+      >;
+    }
+  >;
 };
 
 export type CreateUserMutationVariables = Exact<{
@@ -124,8 +167,33 @@ export type CreateUserMutationVariables = Exact<{
 }>;
 
 export type CreateUserMutation = { __typename?: "Mutation" } & {
-  createUser?: Maybe<{ __typename?: "User" } & UserInfoFragment>;
+  createUser?: Maybe<
+    { __typename?: "CreateUserPayload" } & {
+      record?: Maybe<{ __typename?: "User" } & UserInfoFragment>;
+      errors?: Maybe<
+        Array<
+          | ({ __typename?: "ServerError" } & Errors_ServerError_Fragment)
+          | ({
+              __typename?: "ValidationError";
+            } & Errors_ValidationError_Fragment)
+        >
+      >;
+    }
+  >;
 };
+
+type Errors_ServerError_Fragment = { __typename?: "ServerError" } & Pick<
+  ServerError,
+  "message"
+>;
+
+type Errors_ValidationError_Fragment = {
+  __typename?: "ValidationError";
+} & Pick<ValidationError, "field" | "message">;
+
+export type ErrorsFragment =
+  | Errors_ServerError_Fragment
+  | Errors_ValidationError_Fragment;
 
 export type GetUserQueryVariables = Exact<{
   userId: Scalars["ID"];
@@ -140,7 +208,19 @@ export type RemoveUserMutationVariables = Exact<{
 }>;
 
 export type RemoveUserMutation = { __typename?: "Mutation" } & {
-  removeUser?: Maybe<{ __typename?: "User" } & UserInfoFragment>;
+  removeUser?: Maybe<
+    { __typename?: "RemoveUserPayload" } & {
+      record?: Maybe<{ __typename?: "User" } & UserInfoFragment>;
+      errors?: Maybe<
+        Array<
+          | ({ __typename?: "ServerError" } & Errors_ServerError_Fragment)
+          | ({
+              __typename?: "ValidationError";
+            } & Errors_ValidationError_Fragment)
+        >
+      >;
+    }
+  >;
 };
 
 export type ServerActionPerformedSubscriptionVariables = Exact<{
@@ -186,6 +266,17 @@ export type UsersListQuery = { __typename?: "Query" } & {
   users: Array<{ __typename?: "User" } & UserInfoFragment>;
 };
 
+export const ErrorsFragmentDoc = gql`
+  fragment Errors on Error {
+    ... on ValidationError {
+      field
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+`;
 export const UserInfoFragmentDoc = gql`
   fragment UserInfo on User {
     id
@@ -204,10 +295,16 @@ export const ChangeUsernameDocument = gql`
     $changeUsernameInput: ChangeUsernameInput!
   ) {
     changeUsername(userId: $userId, changeUsernameInput: $changeUsernameInput) {
-      ...UserInfo
+      record {
+        ...UserInfo
+      }
+      errors {
+        ...Errors
+      }
     }
   }
   ${UserInfoFragmentDoc}
+  ${ErrorsFragmentDoc}
 `;
 export type ChangeUsernameMutationFn = Apollo.MutationFunction<
   ChangeUsernameMutation,
@@ -256,10 +353,16 @@ export type ChangeUsernameMutationOptions = Apollo.BaseMutationOptions<
 export const CreateUserDocument = gql`
   mutation CreateUser($createUserInput: CreateUserInput!) {
     createUser(createUserInput: $createUserInput) {
-      ...UserInfo
+      record {
+        ...UserInfo
+      }
+      errors {
+        ...Errors
+      }
     }
   }
   ${UserInfoFragmentDoc}
+  ${ErrorsFragmentDoc}
 `;
 export type CreateUserMutationFn = Apollo.MutationFunction<
   CreateUserMutation,
@@ -356,10 +459,16 @@ export type GetUserQueryResult = Apollo.QueryResult<
 export const RemoveUserDocument = gql`
   mutation RemoveUser($userId: ID!) {
     removeUser(userId: $userId) {
-      ...UserInfo
+      record {
+        ...UserInfo
+      }
+      errors {
+        ...Errors
+      }
     }
   }
   ${UserInfoFragmentDoc}
+  ${ErrorsFragmentDoc}
 `;
 export type RemoveUserMutationFn = Apollo.MutationFunction<
   RemoveUserMutation,
@@ -603,6 +712,8 @@ export interface PossibleTypesResultData {
   };
 }
 const result: PossibleTypesResultData = {
-  possibleTypes: {},
+  possibleTypes: {
+    Error: ["ServerError", "ValidationError"],
+  },
 };
 export default result;
