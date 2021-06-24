@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ErrorsFragment, useGetUserQuery } from "../../generated/graphql";
+import { ErrorMessageFragment, useGetUserQuery } from "../../generated/graphql";
 import { ChangeUserButton } from "../ChangeUserButton/ChangeUserButton";
 import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
 
@@ -32,10 +32,8 @@ export const ChangeUser = ({ userId }: ChangeUserProps) => {
     username,
     onSuccess: (updatedUsername?: string) =>
       setUsername(updatedUsername || username),
-    onError: (errors: ErrorsFragment[]) => {
-      const messages = errors.map(({ message }) => message);
-
-      setErrorMessage(messages.join(". "));
+    onError: (error: ErrorMessageFragment) => {
+      setErrorMessage(error.message);
 
       setTimeout(() => {
         setErrorMessage(null);

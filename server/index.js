@@ -28,7 +28,7 @@ const typeDefs = gql`
 
   type CreateUserPayload {
     record: User
-    errors: [Error!]
+    error: ErrorInterface
   }
 
   input ChangeUsernameInput {
@@ -37,12 +37,12 @@ const typeDefs = gql`
 
   type ChangeUsernamePayload {
     record: User
-    errors: [Error!]
+    error: ErrorInterface
   }
 
   type RemoveUserPayload {
     record: User
-    errors: [Error!]
+    error: ErrorInterface
   }
 
   type ServerAction {
@@ -50,16 +50,18 @@ const typeDefs = gql`
     message: String!
   }
 
-  type ServerError {
+  interface ErrorInterface {
     message: String!
   }
 
-  type ValidationError {
+  type ServerError implements ErrorInterface {
+    message: String!
+  }
+
+  type ValidationError implements ErrorInterface {
     message: String!
     field: String!
   }
-
-  union Error = ServerError | ValidationError
 
   type Query {
     users: [User!]!
@@ -148,7 +150,7 @@ const resolvers = {
       return db.users.filter((dbUser) => user.friends.includes(dbUser.id));
     },
   },
-  Error: {
+  ErrorInterface: {
     __resolveType: (obj) => {
       if (obj.field) {
         return "ValidationError";
@@ -163,24 +165,18 @@ const resolvers = {
 
       if (createUserInput.username === "") {
         return sleep({
-          errors: [
-            {
-              code: 1,
-              message: "`Username` must be at least one character",
-              field: "username",
-            },
-          ],
+          error: {
+            message: "`Username` must be at least one character",
+            field: "username",
+          },
         });
       }
 
       if (db.users.find((user) => user.username === createUserInput.username)) {
         return sleep({
-          errors: [
-            {
-              code: 1,
-              message: `User with username "${createUserInput.username}" already exists`,
-            },
-          ],
+          error: {
+            message: `User with username "${createUserInput.username}" already exists`,
+          },
         });
       }
 
@@ -205,12 +201,9 @@ const resolvers = {
 
       if (!removedUser) {
         return {
-          errors: [
-            {
-              code: 1,
-              message: `User with id "${userId}" not found`,
-            },
-          ],
+          error: {
+            message: `User with id "${userId}" not found`,
+          },
         };
       }
 
@@ -229,13 +222,10 @@ const resolvers = {
     changeUsername: (_, { userId, changeUsernameInput }) => {
       if (changeUsernameInput.username === "") {
         return sleep({
-          errors: [
-            {
-              code: 1,
-              message: "`Username` must be at least one character",
-              field: "username",
-            },
-          ],
+          error: {
+            message: "`Username` must be at least one character",
+            field: "username",
+          },
         });
       }
 
@@ -243,12 +233,9 @@ const resolvers = {
 
       if (!user) {
         return {
-          errors: [
-            {
-              code: 1,
-              message: `User with id "${userId}" not found`,
-            },
-          ],
+          error: {
+            message: `User with id "${userId}" not found`,
+          },
         };
       }
 

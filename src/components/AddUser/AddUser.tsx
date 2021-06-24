@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ErrorsFragment } from "../../generated/graphql";
+import { ErrorMessageFragment } from "../../generated/graphql";
 import { AddUserButton } from "../AddUserButton";
 import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
 
@@ -13,10 +13,8 @@ export const AddUser = () => {
   const commonButtonProps = {
     username,
     onSuccess: () => setUsername(""),
-    onError: (errors: ErrorsFragment[]) => {
-      const messages = errors.map(({ message }) => message);
-
-      setErrorMessage(messages.join(". "));
+    onError: (error: ErrorMessageFragment) => {
+      setErrorMessage(error.message);
 
       setTimeout(() => {
         setErrorMessage(null);

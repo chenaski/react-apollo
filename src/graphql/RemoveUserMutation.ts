@@ -9,8 +9,8 @@ export const RemoveUserMutation = gql`
       record {
         ...UserInfo
       }
-      errors {
-        ...Errors
+      error {
+        ...ErrorMessage
       }
     }
   }

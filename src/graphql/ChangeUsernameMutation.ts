@@ -12,8 +12,8 @@ export const ChangeUsernameMutation = gql`
       record {
         ...UserInfo
       }
-      errors {
-        ...Errors
+      error {
+        ...ErrorMessage
       }
     }
   }

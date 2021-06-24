@@ -88,21 +88,13 @@
             "deprecationReason": null
           },
           {
-            "name": "errors",
+            "name": "error",
             "description": null,
             "args": [],
             "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "UNION",
-                  "name": "Error",
-                  "ofType": null
-                }
-              }
+              "kind": "INTERFACE",
+              "name": "ErrorInterface",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -158,21 +150,13 @@
             "deprecationReason": null
           },
           {
-            "name": "errors",
+            "name": "error",
             "description": null,
             "args": [],
             "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "UNION",
-                  "name": "Error",
-                  "ofType": null
-                }
-              }
+              "kind": "INTERFACE",
+              "name": "ErrorInterface",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -184,12 +168,29 @@
         "possibleTypes": null
       },
       {
-        "kind": "UNION",
-        "name": "Error",
+        "kind": "INTERFACE",
+        "name": "ErrorInterface",
         "description": null,
-        "fields": null,
+        "fields": [
+          {
+            "name": "message",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "inputFields": null,
-        "interfaces": null,
+        "interfaces": [],
         "enumValues": null,
         "possibleTypes": [
           {
@@ -518,21 +519,13 @@
             "deprecationReason": null
           },
           {
-            "name": "errors",
+            "name": "error",
             "description": null,
             "args": [],
             "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "UNION",
-                  "name": "Error",
-                  "ofType": null
-                }
-              }
+              "kind": "INTERFACE",
+              "name": "ErrorInterface",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -609,7 +602,13 @@
           }
         ],
         "inputFields": null,
-        "interfaces": [],
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "ErrorInterface",
+            "ofType": null
+          }
+        ],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -854,7 +853,13 @@
           }
         ],
         "inputFields": null,
-        "interfaces": [],
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "ErrorInterface",
+            "ofType": null
+          }
+        ],
         "enumValues": null,
         "possibleTypes": null
       },

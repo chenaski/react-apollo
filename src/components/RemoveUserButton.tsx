@@ -1,7 +1,7 @@
 import React from "react";
 
 import {
-  ErrorsFragment,
+  ErrorMessageFragment,
   useRemoveUserMutation,
   UserInfoFragment,
   UserRemoveStatus,
@@ -17,7 +17,7 @@ export interface RemoveUserButtonProps {
   updatePolicy?: "refetch" | "cacheUpdate";
   cacheUpdateTarget?: "list" | "item" | "listAndItem";
   onSuccess?: () => void;
-  onError?: (errors: ErrorsFragment[]) => void;
+  onError?: (error: ErrorMessageFragment) => void;
   className?: string;
   children: React.ReactNode;
 }
@@ -69,8 +69,8 @@ export const RemoveUserButton = ({
         variables: { userId, status: UserRemoveStatus.Success },
       });
 
-      if (data.removeUser?.errors) {
-        onError && onError(data.removeUser?.errors);
+      if (data.removeUser?.error) {
+        onError && onError(data.removeUser?.error);
       } else {
         onSuccess && onSuccess();
       }

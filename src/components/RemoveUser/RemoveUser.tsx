@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ErrorsFragment } from "../../generated/graphql";
+import { ErrorMessageFragment } from "../../generated/graphql";
 import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
 import { RemoveUserButton } from "../RemoveUserButton";
 
@@ -17,10 +17,8 @@ export const RemoveUser = ({ userId, onRemoveUser }: RemoveUserProps) => {
   const commonButtonProps = {
     userId,
     onSuccess: onRemoveUser,
-    onError: (errors: ErrorsFragment[]) => {
-      const messages = errors.map(({ message }) => message);
-
-      setErrorMessage(messages.join(". "));
+    onError: (error: ErrorMessageFragment) => {
+      setErrorMessage(error.message);
 
       setTimeout(() => {
         setErrorMessage(null);

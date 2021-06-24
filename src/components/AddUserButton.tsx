@@ -1,7 +1,7 @@
 import React from "react";
 
 import {
-  ErrorsFragment,
+  ErrorMessageFragment,
   useCreateUserMutation,
   UserInfoFragment,
 } from "../generated/graphql";
@@ -15,7 +15,7 @@ export interface AddUserButtonProps {
   updatePolicy?: "refetch" | "cacheUpdate";
   cacheUpdateTarget?: "list" | "item" | "listAndItem";
   onSuccess?: () => void;
-  onError?: (errors: ErrorsFragment[]) => void;
+  onError?: (error: ErrorMessageFragment) => void;
   className?: string;
   children: React.ReactNode;
 }
@@ -68,8 +68,8 @@ export const AddUserButton = ({
       },
     });
 
-    if (result.data?.createUser?.errors) {
-      onError && onError(result.data?.createUser?.errors);
+    if (result.data?.createUser?.error) {
+      onError && onError(result.data?.createUser?.error);
     } else if (!result.errors) {
       onSuccess && onSuccess();
     }

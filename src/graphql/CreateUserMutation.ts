@@ -9,8 +9,8 @@ export const CreateUserMutation = gql`
       record {
         ...UserInfo
       }
-      errors {
-        ...Errors
+      error {
+        ...ErrorMessage
       }
     }
   }
