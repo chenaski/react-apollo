@@ -2,6 +2,7 @@ import React from "react";
 
 import { useUsersListQuery } from "../../generated/graphql";
 import { CheckboxRow } from "../CheckboxRow/CheckboxRow";
+import { GCButton } from "../GCButton/GCButton";
 import { UsersListItem } from "../UsersListItem/UsersListItem";
 
 import classes from "./UsersList.module.css";
@@ -44,6 +45,8 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
       >
         notifyOnNetworkStatusChange
       </CheckboxRow>
+
+      <GCButton className={classes.gcButton} />
 
       {loading ? (
         <p>Loading...</p>

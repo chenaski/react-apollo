@@ -22,6 +22,10 @@
   margin-bottom: 10px;
 }
 
+.gcButton {
+  margin-bottom: 10px;
+}
+
 .list {
   list-style: hiragana-iroha;
   padding: 0;
