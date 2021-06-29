@@ -3,7 +3,7 @@ import React from "react";
 import {
   ErrorMessageFragment,
   useRemoveUserMutation,
-  UserInfoFragment,
+  UserInfoFragment as UserInfo,
   UserRemoveStatus,
   useSetUserRemoveStatusMutation,
 } from "../generated/graphql";
@@ -15,7 +15,7 @@ import { Button } from "./Button/Button";
 export interface RemoveUserButtonProps {
   userId: string;
   updatePolicy?: "refetch" | "cacheUpdate";
-  cacheUpdateTarget?: "list" | "item" | "listAndItem";
+  cacheUpdateTarget?: "list" | "item" | "listAndItem" | "evict";
   onSuccess?: () => void;
   onError?: (error: ErrorMessageFragment) => void;
   className?: string;
@@ -36,7 +36,7 @@ export const RemoveUserButton = ({
     refetchQueries: updatePolicy === "refetch" ? ["UsersList"] : undefined,
     update: (cache, { data, errors }) => {
       if (updatePolicy === "cacheUpdate") {
-        const usersListQueryResult: { users: UserInfoFragment[] } | null =
+        const usersListQueryResult: { users: UserInfo[] } | null =
           cache.readQuery({
             query: UsersListQuery,
           });
@@ -61,6 +61,10 @@ export const RemoveUserButton = ({
               ),
             },
           });
+        }
+
+        if (cacheUpdateTarget === "evict") {
+          cache.evict({ id: cache.identify(user) });
         }
       }
     },

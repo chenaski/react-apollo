@@ -64,6 +64,14 @@ export const RemoveUser = ({ userId, onRemoveUser }: RemoveUserProps) => {
         >
           Remove User - writeQuery (Users List & User)
         </RemoveUserButton>
+
+        <RemoveUserButton
+          {...commonButtonProps}
+          updatePolicy={"cacheUpdate"}
+          cacheUpdateTarget={"evict"}
+        >
+          Remove User - Evict
+        </RemoveUserButton>
       </div>
     </section>
   );
