@@ -1,6 +1,8 @@
 import React from "react";
 
+import { StorageKeys } from "../../constants";
 import { useUsersListQuery } from "../../generated/graphql";
+import { Storage } from "../../utils/Storage";
 import { CheckboxRow } from "../CheckboxRow/CheckboxRow";
 import { GCButton } from "../GCButton/GCButton";
 import { UsersListItem } from "../UsersListItem/UsersListItem";
@@ -12,7 +14,13 @@ export interface UsersListProps {
 }
 
 export const UsersList = ({ onSelectUser }: UsersListProps) => {
-  const [notifyOnChange, setNotifyOnChange] = React.useState(false);
+  const [notifyOnChange, setNotifyOnChange] = React.useState(
+    Storage.get(StorageKeys.NOTIFY_ON_CHANGE) ?? false
+  );
+  const updateNotifyOnChange = (isEnabled: boolean) => {
+    setNotifyOnChange(isEnabled);
+    Storage.set(StorageKeys.NOTIFY_ON_CHANGE, isEnabled);
+  };
   const { data, loading, error, refetch } = useUsersListQuery({
     notifyOnNetworkStatusChange: notifyOnChange,
   });
@@ -41,7 +49,7 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
       <CheckboxRow
         className={classes.checkboxRow}
         checked={notifyOnChange}
-        onChange={setNotifyOnChange}
+        onChange={updateNotifyOnChange}
       >
         notifyOnNetworkStatusChange
       </CheckboxRow>
