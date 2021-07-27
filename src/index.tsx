@@ -12,11 +12,13 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
 import App from "./components/App/App";
+import { StorageKeys } from "./constants";
 import { UserRemoveStatus, UserUpdateStatus } from "./generated/graphql";
 import { UserInfoFragment } from "./graphql/UserInfoFragment";
 import { typeDefs } from "./graphql/typeDefs";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
+import { Storage } from "./utils/Storage";
 
 const httpUrl = `http://localhost:${process.env.REACT_APP_SERVER_PORT}/`;
 const wsUrl = `ws://localhost:${process.env.REACT_APP_SERVER_PORT}/subscriptions`;
@@ -48,7 +50,25 @@ const splitLink = split(
 
 const client = new ApolloClient({
   link: splitLink,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          ...(Storage.get(StorageKeys.USE_TO_REFERENCE)
+            ? {
+                user(_, { args, toReference }) {
+                  if (!args?.userId) return null;
+                  return toReference({
+                    __typename: "User",
+                    id: args.userId,
+                  });
+                },
+              }
+            : {}),
+        },
+      },
+    },
+  }),
   typeDefs,
   resolvers: {
     Mutation: {

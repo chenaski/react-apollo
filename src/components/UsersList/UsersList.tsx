@@ -21,6 +21,15 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
     setNotifyOnChange(isEnabled);
     Storage.set(StorageKeys.NOTIFY_ON_CHANGE, isEnabled);
   };
+
+  const [useToReference, setUseToReference] = React.useState(
+    Storage.get(StorageKeys.USE_TO_REFERENCE) ?? false
+  );
+  const updateUseToReference = (isEnabled: boolean) => {
+    setUseToReference(isEnabled);
+    Storage.set(StorageKeys.USE_TO_REFERENCE, isEnabled);
+  };
+
   const { data, loading, error, refetch } = useUsersListQuery({
     notifyOnNetworkStatusChange: notifyOnChange,
   });
@@ -52,6 +61,14 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
         onChange={updateNotifyOnChange}
       >
         notifyOnNetworkStatusChange
+      </CheckboxRow>
+
+      <CheckboxRow
+        className={classes.checkboxRow}
+        checked={useToReference}
+        onChange={updateUseToReference}
+      >
+        toReference
       </CheckboxRow>
 
       <GCButton className={classes.gcButton} />
