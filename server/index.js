@@ -1,6 +1,12 @@
-const { ApolloServer, gql } = require("apollo-server");
+const { createServer } = require("http");
+const express = require("express");
+const cors = require("cors");
+const { execute, subscribe } = require("graphql");
+const { ApolloServer, gql } = require("apollo-server-express");
 const DataLoader = require("dataloader");
 const { PubSub } = require("graphql-subscriptions");
+const { SubscriptionServer } = require("subscriptions-transport-ws");
+const { makeExecutableSchema } = require("@graphql-tools/schema");
 
 const pubsub = new PubSub();
 
@@ -255,14 +261,33 @@ const resolvers = {
   },
 };
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  subscriptions: {
-    path: "/subscriptions",
-  },
-});
+(async () => {
+  const app = express();
 
-server.listen({ port: process.env.SERVER_PORT }).then(({ url }) => {
-  console.log(`🚀  Server ready at ${url}`);
-});
+  app.use(cors());
+
+  const httpServer = createServer(app);
+
+  const schema = makeExecutableSchema({
+    typeDefs,
+    resolvers,
+  });
+
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    schema,
+  });
+  await server.start();
+  server.applyMiddleware({ app, path: "/" });
+
+  SubscriptionServer.create(
+    { schema, execute, subscribe },
+    { server: httpServer, path: "/subscriptions" }
+  );
+
+  const PORT = process.env.SERVER_PORT;
+  httpServer.listen(PORT, () =>
+    console.log(`Server is now running on http://localhost:${PORT}/`)
+  );
+})();
