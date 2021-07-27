@@ -1,6 +1,6 @@
 const { ApolloServer, gql } = require("apollo-server");
 const DataLoader = require("dataloader");
-const { PubSub } = require("apollo-server");
+const { PubSub } = require("graphql-subscriptions");
 
 const pubsub = new PubSub();
 
