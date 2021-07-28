@@ -3,8 +3,8 @@ import React from "react";
 import { StorageKeys } from "../../constants";
 import { useUsersListQuery } from "../../generated/graphql";
 import { Storage } from "../../utils/Storage";
+import { CacheButtons } from "../CacheButtons/CacheButtons";
 import { CheckboxRow } from "../CheckboxRow/CheckboxRow";
-import { GCButton } from "../GCButton/GCButton";
 import { UsersListItem } from "../UsersListItem/UsersListItem";
 
 import classes from "./UsersList.module.css";
@@ -71,7 +71,7 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
         toReference
       </CheckboxRow>
 
-      <GCButton className={classes.gcButton} />
+      <CacheButtons className={classes.gcButton} />
 
       {loading ? (
         <p>Loading...</p>

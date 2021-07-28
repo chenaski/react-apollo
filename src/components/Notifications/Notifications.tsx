@@ -1,5 +1,7 @@
 import React from "react";
 
+import { useApolloClient } from "@apollo/client";
+
 import {
   ServerAction,
   useServerActionPerformedSubscription,
@@ -8,6 +10,7 @@ import {
 import classes from "./Notifications.module.css";
 
 export const Notifications = () => {
+  const apolloClient = useApolloClient();
   const [lastServerActionsList, setLastServerActionsList] = React.useState<
     ServerAction[]
   >([]);
@@ -40,6 +43,25 @@ export const Notifications = () => {
         onReceiveServerAction(serverAction);
       }
     },
+  });
+
+  apolloClient.onClearStore(() => {
+    onReceiveServerAction({
+      __typename: "ServerAction",
+      date: new Date().toISOString(),
+      message: "Apollo cache has been cleared successfully",
+    });
+
+    return Promise.resolve();
+  });
+  apolloClient.onResetStore(() => {
+    onReceiveServerAction({
+      __typename: "ServerAction",
+      date: new Date().toISOString(),
+      message: "Apollo cache has been restored successfully",
+    });
+
+    return Promise.resolve();
   });
 
   if (!lastServerActionsList.length) return null;

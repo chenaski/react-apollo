@@ -1,0 +1,7 @@
+.buttons {
+  margin: -2px;
+}
+
+.buttons > * {
+  margin: 2px;
+}
