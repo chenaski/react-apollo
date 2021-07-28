@@ -71,6 +71,7 @@ const typeDefs = gql`
 
   type Query {
     users: [User!]!
+    usersList(offset: Int!, limit: Int!): [User!]!
     user(userId: ID!): User
   }
 
@@ -122,7 +123,7 @@ const generateUser = ({ id }) => {
 };
 
 const getMockUsers = () => {
-  return new Array(3)
+  return new Array(100)
     .fill(0)
     .map((_, index) => generateUser({ id: index.toString() }));
 };
@@ -146,6 +147,9 @@ const resolvers = {
   Query: {
     users: () => {
       return sleep(db.users);
+    },
+    usersList: (_, { offset, limit }) => {
+      return sleep(db.users.slice(offset, offset + limit));
     },
     user: async (_, { userId }) => {
       return sleep(await userLoader.load(userId));

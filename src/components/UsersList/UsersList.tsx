@@ -30,9 +30,56 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
     Storage.set(StorageKeys.USE_TO_REFERENCE, isEnabled);
   };
 
-  const { data, loading, error, refetch } = useUsersListQuery({
+  const [isPaginationEnabled, setPaginationEnabled] = React.useState(
+    Storage.get(StorageKeys.PAGINATION_ENABLED) ?? false
+  );
+  const updatePaginationEnabled = (isEnabled: boolean) => {
+    setPaginationEnabled(!isPaginationEnabled);
+    Storage.set(StorageKeys.PAGINATION_ENABLED, isEnabled);
+  };
+
+  const limit = 5;
+  const [offset, setOffset] = React.useState(0);
+  const { data, loading, error, refetch, fetchMore } = useUsersListQuery({
+    variables: {
+      offset,
+      limit,
+    },
     notifyOnNetworkStatusChange: notifyOnChange,
   });
+  const onClickMore = async () => {
+    const nextOffset = offset + limit;
+
+    await fetchMore({
+      variables: {
+        offset: nextOffset,
+      },
+    });
+
+    setOffset(nextOffset);
+  };
+  const nextPage = async () => {
+    const nextOffset = offset + limit;
+
+    await fetchMore({
+      variables: {
+        offset: nextOffset,
+      },
+    });
+
+    setOffset(nextOffset);
+  };
+  const prevPage = async () => {
+    const nextOffset = offset - limit;
+
+    await fetchMore({
+      variables: {
+        offset: nextOffset,
+      },
+    });
+
+    setOffset(nextOffset);
+  };
 
   const getErrorMessage = (): string | null => {
     if (loading) return null;
@@ -71,19 +118,55 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
         toReference
       </CheckboxRow>
 
+      <CheckboxRow
+        className={classes.checkboxRow}
+        checked={isPaginationEnabled}
+        onChange={updatePaginationEnabled}
+      >
+        Pagination
+      </CheckboxRow>
+
       <CacheButtons className={classes.gcButton} />
 
       {loading ? (
         <p>Loading...</p>
       ) : (
         !!data?.users.length && (
-          <ul className={classes.list}>
-            {data.users.map((user) => (
-              <li key={user.id} className={classes.listItem}>
-                <UsersListItem userId={user.id} onSelectUser={onSelectUser} />
-              </li>
-            ))}
-          </ul>
+          <>
+            <div className={classes.usersListHeader}>
+              <p>
+                Users: <b>{data.users.length}</b>
+              </p>
+              {Storage.get(StorageKeys.PAGINATION_ENABLED) ? (
+                <>
+                  <button className={classes.prevPage} onClick={prevPage}>
+                    Prev
+                  </button>
+                  <p className={classes.currentPage}>
+                    <b>{offset / limit}</b>
+                  </p>
+                  <button className={classes.nextPage} onClick={nextPage}>
+                    Next
+                  </button>
+                </>
+              ) : (
+                <button
+                  className={classes.showMoreButton}
+                  onClick={onClickMore}
+                >
+                  Show more
+                </button>
+              )}
+            </div>
+
+            <ul className={classes.list}>
+              {data.users.map((user) => (
+                <li key={user.id} className={classes.listItem}>
+                  <UsersListItem userId={user.id} onSelectUser={onSelectUser} />
+                </li>
+              ))}
+            </ul>
+          </>
         )
       )}
 

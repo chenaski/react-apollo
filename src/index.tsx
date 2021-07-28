@@ -9,7 +9,10 @@ import {
 } from "@apollo/client";
 import { BatchHttpLink } from "@apollo/client/link/batch-http";
 import { WebSocketLink } from "@apollo/client/link/ws";
-import { getMainDefinition } from "@apollo/client/utilities";
+import {
+  getMainDefinition,
+  offsetLimitPagination,
+} from "@apollo/client/utilities";
 
 import App from "./components/App/App";
 import { StorageKeys } from "./constants";
@@ -54,6 +57,23 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
+          usersList: {
+            ...offsetLimitPagination(),
+            ...(Storage.get(StorageKeys.PAGINATION_ENABLED)
+              ? {
+                  read(existing, { args }) {
+                    if (args?.offset && args?.limit) {
+                      return existing.slice(
+                        args.offset,
+                        args.offset + args.limit
+                      );
+                    }
+
+                    return existing;
+                  },
+                }
+              : {}),
+          },
           ...(Storage.get(StorageKeys.USE_TO_REFERENCE)
             ? {
                 user(_, { args, toReference }) {

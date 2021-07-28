@@ -17,14 +17,7 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  /** The `Upload` scalar type represents a file upload. */
-  Upload: any;
 };
-
-export enum CacheControlScope {
-  Public = "PUBLIC",
-  Private = "PRIVATE",
-}
 
 export type ChangeUsernameInput = {
   username: Scalars["String"];
@@ -85,7 +78,13 @@ export type MutationSetUserUpdateStatusArgs = {
 export type Query = {
   __typename?: "Query";
   users: Array<User>;
+  usersList: Array<User>;
   user?: Maybe<User>;
+};
+
+export type QueryUsersListArgs = {
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
 };
 
 export type QueryUserArgs = {
@@ -256,7 +255,10 @@ export type UserInfoFragment = { __typename?: "User" } & Pick<
   "id" | "username" | "updateStatus" | "removeStatus"
 > & { friends: Array<{ __typename?: "User" } & Pick<User, "id" | "username">> };
 
-export type UsersListQueryVariables = Exact<{ [key: string]: never }>;
+export type UsersListQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+}>;
 
 export type UsersListQuery = { __typename?: "Query" } & {
   users: Array<{ __typename?: "User" } & UserInfoFragment>;
@@ -643,8 +645,8 @@ export type SetUserUpdateStatusMutationOptions = Apollo.BaseMutationOptions<
   SetUserUpdateStatusMutationVariables
 >;
 export const UsersListDocument = gql`
-  query UsersList {
-    users {
+  query UsersList($offset: Int!, $limit: Int!) {
+    users: usersList(offset: $offset, limit: $limit) {
       ...UserInfo
     }
   }
@@ -663,11 +665,13 @@ export const UsersListDocument = gql`
  * @example
  * const { data, loading, error } = useUsersListQuery({
  *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
  *   },
  * });
  */
 export function useUsersListQuery(
-  baseOptions?: Apollo.QueryHookOptions<UsersListQuery, UsersListQueryVariables>
+  baseOptions: Apollo.QueryHookOptions<UsersListQuery, UsersListQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<UsersListQuery, UsersListQueryVariables>(
