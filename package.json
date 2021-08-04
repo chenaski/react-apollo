@@ -61,7 +61,10 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "parserOptions": {
+      "warnOnUnsupportedTypeScriptVersion": false
+    }
   },
   "browserslist": {
     "production": [
