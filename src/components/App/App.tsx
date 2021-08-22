@@ -4,13 +4,14 @@ import { AddUser } from "../AddUser/AddUser";
 import { ChangeUser } from "../ChangeUser/ChangeUser";
 import { Notifications } from "../Notifications/Notifications";
 import { RemoveUser } from "../RemoveUser/RemoveUser";
-import { UsersList } from "../UsersList/UsersList";
+import { UsersListContainer } from "../UsersListContainer/UsersListContainer";
 
 import classes from "./App.module.css";
 
 function App() {
-  const [selectedUserId, setSelectedUserId] =
-    React.useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = React.useState<string | null>(
+    null
+  );
   const onSelectUser = ({ userId }: { userId: string }) => {
     if (selectedUserId === userId) setSelectedUserId(null);
     else setSelectedUserId(userId);
@@ -33,7 +34,7 @@ function App() {
         </div>
 
         <div className={classes.rightColumn}>
-          <UsersList onSelectUser={onSelectUser} />
+          <UsersListContainer onSelectUser={onSelectUser} />
         </div>
       </div>
 

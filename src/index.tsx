@@ -59,7 +59,7 @@ const client = new ApolloClient({
         fields: {
           usersList: {
             ...offsetLimitPagination(),
-            ...(Storage.get(StorageKeys.PAGINATION_ENABLED)
+            ...(Storage.get(StorageKeys.OFFSET_PAGINATION_ENABLED)
               ? {
                   read(existing, { args }) {
                     if (args?.offset && args?.limit) {
@@ -85,6 +85,33 @@ const client = new ApolloClient({
                 },
               }
             : {}),
+
+          usersListWithCursor: {
+            merge(existing, incoming, { readField }) {
+              const users = existing ? { ...existing.users } : {};
+
+              incoming.users.forEach((user: { id: string }) => {
+                const id = readField("id", user);
+                if (typeof id === "string") {
+                  users[id] = user;
+                }
+              });
+
+              return {
+                ...incoming,
+                users,
+              };
+            },
+
+            read(existing) {
+              if (existing) {
+                return {
+                  ...existing,
+                  users: Object.values(existing.users),
+                };
+              }
+            },
+          },
         },
       },
     },

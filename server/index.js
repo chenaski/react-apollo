@@ -26,6 +26,20 @@ const typeDefs = gql`
     id: ID!
     username: String!
     friends: [User!]!
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  type UsersPaginatedList {
+    users: [User!]!
+    usersCountBefore: Int!
+    nextCursor: Cursor
+    prevCursor: Cursor
+  }
+
+  type Cursor {
+    id: ID!
+    createdAt: String!
   }
 
   input CreateUserInput {
@@ -69,9 +83,15 @@ const typeDefs = gql`
     field: String!
   }
 
+  input CursorInput {
+    id: ID!
+    createdAt: String!
+  }
+
   type Query {
     users: [User!]!
     usersList(offset: Int!, limit: Int!): [User!]!
+    usersListWithCursor(cursor: CursorInput, limit: Int!): UsersPaginatedList!
     user(userId: ID!): User
   }
 
@@ -119,6 +139,8 @@ const generateUser = ({ id }) => {
 
       return friendId.toString();
     }),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 };
 
@@ -150,6 +172,43 @@ const resolvers = {
     },
     usersList: (_, { offset, limit }) => {
       return sleep(db.users.slice(offset, offset + limit));
+    },
+    usersListWithCursor: (_, { cursor, limit }) => {
+      const sortedUsers = db.users
+        .sort((user1, user2) => user1.id - user2.id)
+        .sort(
+          (user1, user2) =>
+            new Date(user1.createdAt) - new Date(user2.createdAt)
+        );
+
+      if (!cursor) {
+        const { id, createdAt } = sortedUsers[0];
+        cursor = { id, createdAt };
+      }
+
+      const userIndex = db.users.findIndex(
+        (user) => user.createdAt === cursor.createdAt && user.id === cursor.id
+      );
+      const prevUser =
+        userIndex >= limit ? sortedUsers[userIndex - limit] : null;
+      const prevCursor = prevUser
+        ? { id: prevUser.id, createdAt: prevUser.createdAt }
+        : null;
+      const nextUser =
+        userIndex + limit < sortedUsers.length
+          ? sortedUsers[userIndex + limit]
+          : null;
+      const nextCursor = nextUser
+        ? { id: nextUser.id, createdAt: nextUser.createdAt }
+        : null;
+      const usersList = db.users.slice(userIndex, userIndex + limit);
+
+      return sleep({
+        nextCursor,
+        prevCursor,
+        users: usersList,
+        usersCountBefore: userIndex + limit,
+      });
     },
     user: async (_, { userId }) => {
       return sleep(await userLoader.load(userId));
@@ -194,6 +253,8 @@ const resolvers = {
         id: db.users.length.toString(),
         friends: [],
         ...createUserInput,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       await sleep(onServerActionPerformed("User object created"));
@@ -249,7 +310,11 @@ const resolvers = {
         };
       }
 
-      const updatedUser = { ...user, ...changeUsernameInput };
+      const updatedUser = {
+        ...user,
+        ...changeUsernameInput,
+        updatedAt: new Date().toISOString(),
+      };
 
       db.users = db.users.filter((user) => userId !== user.id);
       db.users.unshift(updatedUser);

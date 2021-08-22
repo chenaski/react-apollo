@@ -39,6 +39,17 @@ export type CreateUserPayload = {
   error?: Maybe<ErrorInterface>;
 };
 
+export type Cursor = {
+  __typename?: "Cursor";
+  id: Scalars["ID"];
+  createdAt: Scalars["String"];
+};
+
+export type CursorInput = {
+  id: Scalars["ID"];
+  createdAt: Scalars["String"];
+};
+
 export type ErrorInterface = {
   message: Scalars["String"];
 };
@@ -79,11 +90,17 @@ export type Query = {
   __typename?: "Query";
   users: Array<User>;
   usersList: Array<User>;
+  usersListWithCursor: UsersPaginatedList;
   user?: Maybe<User>;
 };
 
 export type QueryUsersListArgs = {
   offset: Scalars["Int"];
+  limit: Scalars["Int"];
+};
+
+export type QueryUsersListWithCursorArgs = {
+  cursor?: Maybe<CursorInput>;
   limit: Scalars["Int"];
 };
 
@@ -115,10 +132,12 @@ export type Subscription = {
 
 export type User = {
   __typename?: "User";
+  createdAt: Scalars["String"];
   friends: Array<User>;
   id: Scalars["ID"];
   removeStatus: UserRemoveStatus;
   updateStatus: UserUpdateStatus;
+  updatedAt: Scalars["String"];
   username: Scalars["String"];
 };
 
@@ -136,6 +155,14 @@ export enum UserUpdateStatus {
   Failure = "FAILURE",
 }
 
+export type UsersPaginatedList = {
+  __typename?: "UsersPaginatedList";
+  users: Array<User>;
+  usersCountBefore: Scalars["Int"];
+  nextCursor?: Maybe<Cursor>;
+  prevCursor?: Maybe<Cursor>;
+};
+
 export type ValidationError = ErrorInterface & {
   __typename?: "ValidationError";
   message: Scalars["String"];
@@ -147,46 +174,57 @@ export type ChangeUsernameMutationVariables = Exact<{
   changeUsernameInput: ChangeUsernameInput;
 }>;
 
-export type ChangeUsernameMutation = { __typename?: "Mutation" } & {
-  changeUsername?: Maybe<
-    { __typename?: "ChangeUsernamePayload" } & {
-      record?: Maybe<{ __typename?: "User" } & UserInfoFragment>;
-      error?: Maybe<
-        | ({ __typename?: "ServerError" } & ErrorMessage_ServerError_Fragment)
-        | ({
-            __typename?: "ValidationError";
-          } & ErrorMessage_ValidationError_Fragment)
-      >;
-    }
-  >;
+export type ChangeUsernameMutation = {
+  __typename?: "Mutation";
+  changeUsername?: Maybe<{
+    __typename?: "ChangeUsernamePayload";
+    record?: Maybe<{
+      __typename?: "User";
+      id: string;
+      username: string;
+      updateStatus: UserUpdateStatus;
+      removeStatus: UserRemoveStatus;
+      friends: Array<{ __typename?: "User"; id: string; username: string }>;
+    }>;
+    error?: Maybe<
+      | { __typename?: "ServerError"; message: string }
+      | { __typename?: "ValidationError"; message: string }
+    >;
+  }>;
 };
 
 export type CreateUserMutationVariables = Exact<{
   createUserInput: CreateUserInput;
 }>;
 
-export type CreateUserMutation = { __typename?: "Mutation" } & {
-  createUser?: Maybe<
-    { __typename?: "CreateUserPayload" } & {
-      record?: Maybe<{ __typename?: "User" } & UserInfoFragment>;
-      error?: Maybe<
-        | ({ __typename?: "ServerError" } & ErrorMessage_ServerError_Fragment)
-        | ({
-            __typename?: "ValidationError";
-          } & ErrorMessage_ValidationError_Fragment)
-      >;
-    }
-  >;
+export type CreateUserMutation = {
+  __typename?: "Mutation";
+  createUser?: Maybe<{
+    __typename?: "CreateUserPayload";
+    record?: Maybe<{
+      __typename?: "User";
+      id: string;
+      username: string;
+      updateStatus: UserUpdateStatus;
+      removeStatus: UserRemoveStatus;
+      friends: Array<{ __typename?: "User"; id: string; username: string }>;
+    }>;
+    error?: Maybe<
+      | { __typename?: "ServerError"; message: string }
+      | { __typename?: "ValidationError"; message: string }
+    >;
+  }>;
 };
 
-type ErrorMessage_ServerError_Fragment = { __typename?: "ServerError" } & Pick<
-  ServerError,
-  "message"
->;
+type ErrorMessage_ServerError_Fragment = {
+  __typename?: "ServerError";
+  message: string;
+};
 
 type ErrorMessage_ValidationError_Fragment = {
   __typename?: "ValidationError";
-} & Pick<ValidationError, "message">;
+  message: string;
+};
 
 export type ErrorMessageFragment =
   | ErrorMessage_ServerError_Fragment
@@ -196,26 +234,39 @@ export type GetUserQueryVariables = Exact<{
   userId: Scalars["ID"];
 }>;
 
-export type GetUserQuery = { __typename?: "Query" } & {
-  user?: Maybe<{ __typename?: "User" } & UserInfoFragment>;
+export type GetUserQuery = {
+  __typename?: "Query";
+  user?: Maybe<{
+    __typename?: "User";
+    id: string;
+    username: string;
+    updateStatus: UserUpdateStatus;
+    removeStatus: UserRemoveStatus;
+    friends: Array<{ __typename?: "User"; id: string; username: string }>;
+  }>;
 };
 
 export type RemoveUserMutationVariables = Exact<{
   userId: Scalars["ID"];
 }>;
 
-export type RemoveUserMutation = { __typename?: "Mutation" } & {
-  removeUser?: Maybe<
-    { __typename?: "RemoveUserPayload" } & {
-      record?: Maybe<{ __typename?: "User" } & UserInfoFragment>;
-      error?: Maybe<
-        | ({ __typename?: "ServerError" } & ErrorMessage_ServerError_Fragment)
-        | ({
-            __typename?: "ValidationError";
-          } & ErrorMessage_ValidationError_Fragment)
-      >;
-    }
-  >;
+export type RemoveUserMutation = {
+  __typename?: "Mutation";
+  removeUser?: Maybe<{
+    __typename?: "RemoveUserPayload";
+    record?: Maybe<{
+      __typename?: "User";
+      id: string;
+      username: string;
+      updateStatus: UserUpdateStatus;
+      removeStatus: UserRemoveStatus;
+      friends: Array<{ __typename?: "User"; id: string; username: string }>;
+    }>;
+    error?: Maybe<
+      | { __typename?: "ServerError"; message: string }
+      | { __typename?: "ValidationError"; message: string }
+    >;
+  }>;
 };
 
 export type ServerActionPerformedSubscriptionVariables = Exact<{
@@ -224,10 +275,11 @@ export type ServerActionPerformedSubscriptionVariables = Exact<{
 
 export type ServerActionPerformedSubscription = {
   __typename?: "Subscription";
-} & {
-  serverActionPerformed?: Maybe<
-    { __typename?: "ServerAction" } & Pick<ServerAction, "date" | "message">
-  >;
+  serverActionPerformed?: Maybe<{
+    __typename?: "ServerAction";
+    date: string;
+    message: string;
+  }>;
 };
 
 export type SetUserRemoveStatusMutationVariables = Exact<{
@@ -235,33 +287,76 @@ export type SetUserRemoveStatusMutationVariables = Exact<{
   status: UserRemoveStatus;
 }>;
 
-export type SetUserRemoveStatusMutation = { __typename?: "Mutation" } & Pick<
-  Mutation,
-  "setUserRemoveStatus"
->;
+export type SetUserRemoveStatusMutation = {
+  __typename?: "Mutation";
+  setUserRemoveStatus: boolean;
+};
 
 export type SetUserUpdateStatusMutationVariables = Exact<{
   userId: Scalars["ID"];
   status: UserUpdateStatus;
 }>;
 
-export type SetUserUpdateStatusMutation = { __typename?: "Mutation" } & Pick<
-  Mutation,
-  "setUserUpdateStatus"
->;
+export type SetUserUpdateStatusMutation = {
+  __typename?: "Mutation";
+  setUserUpdateStatus: boolean;
+};
 
-export type UserInfoFragment = { __typename?: "User" } & Pick<
-  User,
-  "id" | "username" | "updateStatus" | "removeStatus"
-> & { friends: Array<{ __typename?: "User" } & Pick<User, "id" | "username">> };
+export type UserInfoFragment = {
+  __typename?: "User";
+  id: string;
+  username: string;
+  updateStatus: UserUpdateStatus;
+  removeStatus: UserRemoveStatus;
+  friends: Array<{ __typename?: "User"; id: string; username: string }>;
+};
 
 export type UsersListQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
 }>;
 
-export type UsersListQuery = { __typename?: "Query" } & {
-  users: Array<{ __typename?: "User" } & UserInfoFragment>;
+export type UsersListQuery = {
+  __typename?: "Query";
+  users: Array<{
+    __typename?: "User";
+    id: string;
+    username: string;
+    updateStatus: UserUpdateStatus;
+    removeStatus: UserRemoveStatus;
+    friends: Array<{ __typename?: "User"; id: string; username: string }>;
+  }>;
+};
+
+export type UsersListWithCursorQueryVariables = Exact<{
+  cursor?: Maybe<CursorInput>;
+  limit: Scalars["Int"];
+}>;
+
+export type UsersListWithCursorQuery = {
+  __typename?: "Query";
+  usersListWithCursor: {
+    __typename?: "UsersPaginatedList";
+    usersCountBefore: number;
+    users: Array<{
+      __typename?: "User";
+      id: string;
+      username: string;
+      updateStatus: UserUpdateStatus;
+      removeStatus: UserRemoveStatus;
+      friends: Array<{ __typename?: "User"; id: string; username: string }>;
+    }>;
+    nextCursor?: Maybe<{
+      __typename?: "Cursor";
+      id: string;
+      createdAt: string;
+    }>;
+    prevCursor?: Maybe<{
+      __typename?: "Cursor";
+      id: string;
+      createdAt: string;
+    }>;
+  };
 };
 
 export const ErrorMessageFragmentDoc = gql`
@@ -698,6 +793,77 @@ export type UsersListLazyQueryHookResult = ReturnType<
 export type UsersListQueryResult = Apollo.QueryResult<
   UsersListQuery,
   UsersListQueryVariables
+>;
+export const UsersListWithCursorDocument = gql`
+  query UsersListWithCursor($cursor: CursorInput, $limit: Int!) {
+    usersListWithCursor(cursor: $cursor, limit: $limit) {
+      users {
+        ...UserInfo
+      }
+      usersCountBefore
+      nextCursor {
+        id
+        createdAt
+      }
+      prevCursor {
+        id
+        createdAt
+      }
+    }
+  }
+  ${UserInfoFragmentDoc}
+`;
+
+/**
+ * __useUsersListWithCursorQuery__
+ *
+ * To run a query within a React component, call `useUsersListWithCursorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUsersListWithCursorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUsersListWithCursorQuery({
+ *   variables: {
+ *      cursor: // value for 'cursor'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useUsersListWithCursorQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    UsersListWithCursorQuery,
+    UsersListWithCursorQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    UsersListWithCursorQuery,
+    UsersListWithCursorQueryVariables
+  >(UsersListWithCursorDocument, options);
+}
+export function useUsersListWithCursorLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UsersListWithCursorQuery,
+    UsersListWithCursorQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    UsersListWithCursorQuery,
+    UsersListWithCursorQueryVariables
+  >(UsersListWithCursorDocument, options);
+}
+export type UsersListWithCursorQueryHookResult = ReturnType<
+  typeof useUsersListWithCursorQuery
+>;
+export type UsersListWithCursorLazyQueryHookResult = ReturnType<
+  typeof useUsersListWithCursorLazyQuery
+>;
+export type UsersListWithCursorQueryResult = Apollo.QueryResult<
+  UsersListWithCursorQuery,
+  UsersListWithCursorQueryVariables
 >;
 
 export interface PossibleTypesResultData {

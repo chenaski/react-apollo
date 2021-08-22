@@ -3,9 +3,8 @@ import React from "react";
 import { StorageKeys } from "../../constants";
 import { useUsersListQuery } from "../../generated/graphql";
 import { Storage } from "../../utils/Storage";
-import { CacheButtons } from "../CacheButtons/CacheButtons";
-import { CheckboxRow } from "../CheckboxRow/CheckboxRow";
 import { UsersListItem } from "../UsersListItem/UsersListItem";
+import { UsersListOptions } from "../UsersListOptions/UsersListOptions";
 
 import classes from "./UsersList.module.css";
 
@@ -14,30 +13,6 @@ export interface UsersListProps {
 }
 
 export const UsersList = ({ onSelectUser }: UsersListProps) => {
-  const [notifyOnChange, setNotifyOnChange] = React.useState(
-    Storage.get(StorageKeys.NOTIFY_ON_CHANGE) ?? false
-  );
-  const updateNotifyOnChange = (isEnabled: boolean) => {
-    setNotifyOnChange(isEnabled);
-    Storage.set(StorageKeys.NOTIFY_ON_CHANGE, isEnabled);
-  };
-
-  const [useToReference, setUseToReference] = React.useState(
-    Storage.get(StorageKeys.USE_TO_REFERENCE) ?? false
-  );
-  const updateUseToReference = (isEnabled: boolean) => {
-    setUseToReference(isEnabled);
-    Storage.set(StorageKeys.USE_TO_REFERENCE, isEnabled);
-  };
-
-  const [isPaginationEnabled, setPaginationEnabled] = React.useState(
-    Storage.get(StorageKeys.PAGINATION_ENABLED) ?? false
-  );
-  const updatePaginationEnabled = (isEnabled: boolean) => {
-    setPaginationEnabled(!isPaginationEnabled);
-    Storage.set(StorageKeys.PAGINATION_ENABLED, isEnabled);
-  };
-
   const limit = 5;
   const [offset, setOffset] = React.useState(0);
   const { data, loading, error, refetch, fetchMore } = useUsersListQuery({
@@ -45,7 +20,7 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
       offset,
       limit,
     },
-    notifyOnNetworkStatusChange: notifyOnChange,
+    notifyOnNetworkStatusChange: Storage.get(StorageKeys.NOTIFY_ON_CHANGE),
   });
   const onClickMore = async () => {
     const nextOffset = offset + limit;
@@ -91,42 +66,7 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
 
   return (
     <section>
-      <div className={classes.header}>
-        <h2 className={classes.title}>Users</h2>
-        <button
-          className={classes.refetechButton}
-          onClick={() => refetch()}
-          disabled={loading}
-        >
-          ↻
-        </button>
-      </div>
-
-      <CheckboxRow
-        className={classes.checkboxRow}
-        checked={notifyOnChange}
-        onChange={updateNotifyOnChange}
-      >
-        notifyOnNetworkStatusChange
-      </CheckboxRow>
-
-      <CheckboxRow
-        className={classes.checkboxRow}
-        checked={useToReference}
-        onChange={updateUseToReference}
-      >
-        toReference
-      </CheckboxRow>
-
-      <CheckboxRow
-        className={classes.checkboxRow}
-        checked={isPaginationEnabled}
-        onChange={updatePaginationEnabled}
-      >
-        Pagination
-      </CheckboxRow>
-
-      <CacheButtons className={classes.gcButton} />
+      <UsersListOptions loading={loading} refetch={refetch} />
 
       {loading ? (
         <p>Loading...</p>
@@ -135,15 +75,15 @@ export const UsersList = ({ onSelectUser }: UsersListProps) => {
           <>
             <div className={classes.usersListHeader}>
               <p>
-                Users: <b>{data.users.length}</b>
+                Users: <b>{offset + limit}</b>
               </p>
-              {Storage.get(StorageKeys.PAGINATION_ENABLED) ? (
+              {Storage.get(StorageKeys.OFFSET_PAGINATION_ENABLED) ? (
                 <>
                   <button className={classes.prevPage} onClick={prevPage}>
                     Prev
                   </button>
                   <p className={classes.currentPage}>
-                    <b>{offset / limit}</b>
+                    <b>{offset / limit + 1}</b>
                   </p>
                   <button className={classes.nextPage} onClick={nextPage}>
                     Next
