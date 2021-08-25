@@ -12,6 +12,10 @@
   padding: 20px;
 }
 
+.vip {
+  background-color: lightgoldenrodyellow;
+}
+
 .usersListHeader {
   margin: 10px 0 0;
   display: flex;

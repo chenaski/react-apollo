@@ -1,4 +1,5 @@
 import { useGetUserQuery } from "../../generated/graphql";
+import { vipUsersIdsVar } from "../../store";
 import { UserStatus } from "../UserStatus/UserStatus";
 
 import classes from "./UsersListItem.module.css";
@@ -23,6 +24,16 @@ export const UsersListItem = ({ userId, onSelectUser }: UsersListItemProps) => {
 
   const user = data.user;
 
+  const onChangeVipStatus = ({ userId }: { userId: string }) => {
+    const vipUsersIds = vipUsersIdsVar();
+
+    if (!vipUsersIds.includes(userId)) {
+      vipUsersIdsVar([...vipUsersIds, userId]);
+    } else {
+      vipUsersIdsVar(vipUsersIds.filter((id) => id !== userId));
+    }
+  };
+
   return (
     <>
       <div className={classes.userInfoRow}>
@@ -41,6 +52,7 @@ export const UsersListItem = ({ userId, onSelectUser }: UsersListItemProps) => {
           >
             Edit
           </button>
+          <button onClick={() => onChangeVipStatus({ userId })}>Vip</button>
         </div>
       </div>
 

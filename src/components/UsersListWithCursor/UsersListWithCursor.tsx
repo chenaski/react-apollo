@@ -1,7 +1,11 @@
+import cn from "classnames";
 import React from "react";
+
+import { useReactiveVar } from "@apollo/client";
 
 import { StorageKeys } from "../../constants";
 import { useUsersListWithCursorQuery } from "../../generated/graphql";
+import { vipUsersIdsVar } from "../../store";
 import { Storage } from "../../utils/Storage";
 import { UsersListItem } from "../UsersListItem/UsersListItem";
 import { UsersListOptions } from "../UsersListOptions/UsersListOptions";
@@ -61,6 +65,8 @@ export const UsersListWithCursor = ({ onSelectUser }: UsersListProps) => {
   };
   const errorMessage = getErrorMessage();
 
+  const vipUsersIds = useReactiveVar(vipUsersIdsVar);
+
   return (
     <section>
       <UsersListOptions loading={loading} refetch={refetch} />
@@ -87,7 +93,13 @@ export const UsersListWithCursor = ({ onSelectUser }: UsersListProps) => {
 
             <ul className={classes.list}>
               {users.map((user) => (
-                <li key={user.id} className={classes.listItem}>
+                <li
+                  key={user.id}
+                  className={cn([
+                    classes.listItem,
+                    { [classes.vip]: vipUsersIds.includes(user.id) },
+                  ])}
+                >
                   <UsersListItem userId={user.id} onSelectUser={onSelectUser} />
                 </li>
               ))}
